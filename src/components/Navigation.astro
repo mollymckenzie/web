@@ -139,6 +139,13 @@ function isActive(href: string, currentPath: string): boolean {
     display: none;
   }
 
+  /* Show brand text on small screens and up */
+  @media (min-width: 640px) {
+    .brand-text {
+      display: inline;
+    }
+  }
+
   /* Mobile menu button */
   .mobile-menu-button {
     display: flex;
@@ -228,10 +235,6 @@ function isActive(href: string, currentPath: string): boolean {
 
   /* Tablet and Desktop */
   @media (min-width: 768px) {
-    .brand-text {
-      display: inline;
-    }
-
     .mobile-menu-button {
       display: none;
     }
@@ -248,14 +251,6 @@ function isActive(href: string, currentPath: string): boolean {
 
     .nav-link {
       padding: var(--space-2) var(--space-4);
-    }
-  }
-
-  /* Large screens - show full brand name */
-  @media (min-width: 640px) {
-    .brand-text {
-      display: inline;
-      font-size: var(--font-size-lg);
     }
   }
 </style>
