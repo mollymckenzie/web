@@ -16,6 +16,36 @@ import Layout from '@layouts/Layout.astro';
     </p>
   </div>
 
+  <section class="audience-section">
+    <h2>Who This Library Supports</h2>
+    <div class="audience-grid">
+      <article class="audience-card">
+        <h3>Teacher</h3>
+        <p>
+          Find classroom-ready datasets, guides, and examples to support lessons in data literacy,
+          analytics, and applied research.
+        </p>
+        <a href="/web/teacher" class="audience-link"> Go to Teacher Page → </a>
+      </article>
+      <article class="audience-card">
+        <h3>Student</h3>
+        <p>
+          Explore learning resources, beginner-friendly tools, and real datasets for assignments,
+          projects, and portfolio work.
+        </p>
+        <a href="/web/student" class="audience-link"> Go to Student Page → </a>
+      </article>
+      <article class="audience-card">
+        <h3>Community Member</h3>
+        <p>
+          Discover and share locally relevant resources, connect data to community needs, and
+          contribute practical knowledge from the field.
+        </p>
+        <a href="/web/community-member" class="audience-link"> Go to Community Page → </a>
+      </article>
+    </div>
+  </section>
+
   <section class="features">
     <div class="feature-grid">
       <article class="feature-card">
@@ -125,6 +155,58 @@ import Layout from '@layouts/Layout.astro';
     max-width: 700px;
     margin: 0 auto;
     line-height: var(--line-height-relaxed);
+  }
+
+  /* Audience Section */
+  .audience-section {
+    margin-bottom: var(--space-16);
+  }
+
+  .audience-section h2 {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+
+  .audience-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 768px) {
+    .audience-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .audience-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+  }
+
+  .audience-card h3 {
+    margin-bottom: var(--space-3);
+    font-size: var(--font-size-xl);
+  }
+
+  .audience-card p {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .audience-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .audience-link:hover {
+    color: var(--color-primary-dark);
   }
 
   /* Features Section */

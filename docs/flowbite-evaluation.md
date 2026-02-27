@@ -10,3 +10,23 @@ Flowbite (Tailwind component library) can improve UI patterns, but it requires T
 
 ## Current Starter
 A basic `data-preview` page is added without Tailwind/Flowbite to validate structure. After Tailwind is in place, swap markup for Flowbite components.
+
+## Current Investigation Status
+
+Flowbite is still not fully validated in this codebase and needs deeper troubleshooting before committing to it.
+
+### Troubleshooting Checklist
+1. Confirm Tailwind setup version and plugin compatibility (`tailwindcss` + Flowbite plugin).
+2. Validate PostCSS config against Tailwind version in this repo.
+3. Run a minimal Flowbite component smoke test on one page.
+4. Verify generated CSS includes Flowbite utilities/components.
+5. Decide: keep Flowbite or remove dependency and continue with native project styles.
+
+## Decision Gate
+
+Only after Flowbite is confirmed (or intentionally dropped), continue with:
+
+- `data-preview` page design decisions
+- Datasheet structure and UX implementation
+
+This avoids rework while UI foundation is still uncertain.
