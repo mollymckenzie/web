@@ -22,7 +22,7 @@ const features = collection.features as GeoMarkerFeature[];
   ></script>
   <section>
     <h1>Community Map</h1>
-    <p>This page renders an interactive map of markers from our canonical dataset.</p>
+    <p>Interactive map of community data library locations, datasets, organizations, and events.</p>
 
     <div id="map" role="region" aria-label="Community map"></div>
 
@@ -156,9 +156,9 @@ const features = collection.features as GeoMarkerFeature[];
 
     <style>
       #map {
-        height: 420px;
+        height: 520px;
         border: 1px solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--radius-lg);
         box-shadow: var(--shadow-sm);
         margin: var(--space-4) 0;
       }
@@ -168,50 +168,70 @@ const features = collection.features as GeoMarkerFeature[];
         gap: var(--space-4);
         grid-template-columns: 1fr;
         margin-bottom: var(--space-4);
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4) var(--space-5);
+      }
+
+      @media (min-width: 640px) {
+        .filters {
+          grid-template-columns: auto 1fr;
+          align-items: center;
+        }
       }
 
       .filters fieldset {
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-sm);
-        padding: var(--space-3);
+        border: none;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        align-items: center;
+      }
+
+      .filters legend {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--color-text-muted);
+        margin-bottom: var(--space-2);
+        width: 100%;
       }
 
       .filters label {
         display: inline-flex;
         align-items: center;
         gap: var(--space-2);
-        margin-right: var(--space-3);
+        font-size: var(--font-size-sm);
+        cursor: pointer;
       }
 
       .tag-filter {
         display: flex;
         align-items: center;
         gap: var(--space-2);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--color-text-muted);
+      }
+
+      .tag-filter input {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--font-size-sm);
+        background: var(--color-background);
+        color: var(--color-text);
+        min-width: 160px;
+      }
+
+      .marker-count {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-muted);
+        margin-top: var(--space-2);
       }
     </style>
 
-    <ul>
-      {
-        features.map((f) => (
-          <li>
-            <strong>{f.properties.name}</strong>
-            <span> — {f.properties.category}</span>
-            <span>
-              {' '}
-              — [{f.geometry.coordinates[1].toFixed(5)}, {f.geometry.coordinates[0].toFixed(5)}]
-            </span>
-            {f.properties.sourceUrl && (
-              <span>
-                {' '}
-                —{' '}
-                <a href={f.properties.sourceUrl} rel="noopener noreferrer" target="_blank">
-                  Source
-                </a>
-              </span>
-            )}
-          </li>
-        ))
-      }
-    </ul>
+    <p class="marker-count">{features.length} location{features.length !== 1 ? 's' : ''} plotted on the map.</p>
   </section>
 </Layout>

@@ -9,8 +9,7 @@ const navItems = [
   { href: '/web/community-library', label: 'Community Library' },
   { href: '/web/maps', label: 'Map' },
   { href: '/web/data-preview', label: 'Data Preview' },
-  { href: '/web/submit', label: 'Submit Resource' },
-  { href: '/web/about', label: 'About' },
+  { href: '/web/submit', label: 'Submit' },
 ];
 
 function isActive(href: string, currentPath: string): boolean {
@@ -25,8 +24,12 @@ function isActive(href: string, currentPath: string): boolean {
   <div class="nav-container">
     <div class="nav-brand">
       <a href="/web/" class="brand-link">
-        <span class="brand-icon">📚</span>
-        <span class="brand-text">Community Data Libraries</span>
+        <svg class="brand-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        <span class="brand-short">CDL</span>
+        <span class="brand-full">Community Data Libraries</span>
       </a>
     </div>
 
@@ -98,23 +101,24 @@ function isActive(href: string, currentPath: string): boolean {
 
 <style>
   .navbar {
-    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+    background: color-mix(in srgb, var(--color-surface) 90%, transparent);
     border-bottom: 1px solid var(--color-border);
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: var(--shadow-sm);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .nav-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--space-3) var(--space-6);
+    padding: 0 var(--space-6);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: var(--space-4);
+    height: 60px;
   }
 
   .nav-brand {
@@ -124,11 +128,12 @@ function isActive(href: string, currentPath: string): boolean {
   .brand-link {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    font-size: var(--font-size-lg);
+    gap: var(--space-2);
+    font-size: var(--font-size-base);
     font-weight: 700;
     color: var(--color-text);
     text-decoration: none;
+    letter-spacing: -0.01em;
   }
 
   .brand-link:hover {
@@ -137,16 +142,28 @@ function isActive(href: string, currentPath: string): boolean {
   }
 
   .brand-icon {
-    font-size: var(--font-size-2xl);
+    color: var(--color-primary);
+    flex-shrink: 0;
   }
 
-  .brand-text {
+  .brand-short {
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    letter-spacing: 0.02em;
+  }
+
+  .brand-full {
     display: none;
+    color: var(--color-text-muted);
+    font-weight: 500;
   }
 
-  /* Show brand text on small screens and up */
-  @media (min-width: 640px) {
-    .brand-text {
+  @media (min-width: 900px) {
+    .brand-short {
+      display: none;
+    }
+
+    .brand-full {
       display: inline;
     }
   }
@@ -156,14 +173,18 @@ function isActive(href: string, currentPath: string): boolean {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 38px;
-    height: 34px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    width: 36px;
+    height: 30px;
+    background: transparent;
+    border: none;
     cursor: pointer;
-    padding: 6px;
+    padding: 4px 2px;
     z-index: 101;
+    border-radius: var(--radius-sm);
+  }
+
+  .mobile-menu-button:hover {
+    background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
   }
 
   .hamburger-line {
@@ -171,38 +192,38 @@ function isActive(href: string, currentPath: string): boolean {
     height: 2px;
     background-color: var(--color-text);
     border-radius: 2px;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
+    transform-origin: center;
   }
 
   .mobile-menu-button.active .hamburger-line:nth-child(1) {
-    transform: rotate(45deg) translate(6px, 6px);
+    transform: rotate(45deg) translate(5px, 5px);
   }
 
   .mobile-menu-button.active .hamburger-line:nth-child(2) {
     opacity: 0;
+    transform: scaleX(0);
   }
 
   .mobile-menu-button.active .hamburger-line:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
+    transform: rotate(-45deg) translate(5px, -5px);
   }
 
   /* Navigation links */
   .nav-links {
     display: flex;
     list-style: none;
-    gap: var(--space-2);
+    gap: var(--space-1);
     margin: 0;
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
     flex-direction: column;
-    padding: var(--space-3);
-    margin: var(--space-2) var(--space-4) 0;
+    padding: var(--space-3) var(--space-4);
     max-height: 0;
     overflow: hidden;
     transition:
@@ -211,8 +232,8 @@ function isActive(href: string, currentPath: string): boolean {
   }
 
   .nav-links.active {
-    max-height: 400px;
-    padding: var(--space-3);
+    max-height: 420px;
+    padding: var(--space-3) var(--space-4);
   }
 
   .nav-item {
@@ -222,29 +243,27 @@ function isActive(href: string, currentPath: string): boolean {
   .nav-link {
     display: block;
     padding: var(--space-2) var(--space-3);
-    color: var(--color-text);
+    color: var(--color-text-muted);
     font-weight: 500;
-    border-radius: 999px;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-md);
     transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
+      background-color 0.15s ease,
+      color 0.15s ease;
+    text-decoration: none;
+    white-space: nowrap;
   }
 
   .nav-link:hover {
-    background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+    background-color: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
     color: var(--color-primary);
     text-decoration: none;
   }
 
   .nav-link.active {
-    background-color: var(--color-primary);
-    color: white;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .nav-link.active:hover {
-    background-color: var(--color-primary-dark);
-    color: white;
+    background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+    color: var(--color-primary);
+    font-weight: 600;
   }
 
   /* Tablet and Desktop */
@@ -266,7 +285,7 @@ function isActive(href: string, currentPath: string): boolean {
     }
 
     .nav-link {
-      padding: var(--space-2) var(--space-4);
+      padding: var(--space-2) var(--space-3);
     }
   }
 </style>
