@@ -1,0 +1,16 @@
+# Census ACS Demographics
+
+id: census-acs-demographics
+version: "1.0"
+last_updated: "2024-12-01"
+
+# Basic Info
+title: "Census ACS Demographics"
+short_title: "ACS Demographics"
+description: >
+  Example entry for U.S. Census American Community Survey demographics data.
+
+provider:
+  name: "U.S. Census Bureau"
+  agency: "U.S. Department of Commerce"
+  url: "https://www.census.gov/programs-surveys/acs"

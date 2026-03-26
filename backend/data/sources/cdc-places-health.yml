@@ -1,0 +1,15 @@
+# CDC Places
+
+id: cdc-places-health
+version: "1.0"
+last_updated: "2024-12-01"
+
+# Basic Info
+title: "CDC PLACES: Local Data for Better Health"
+short_title: "CDC PLACES Health"
+description: >
+  Example entry for CDC PLACES data.
+
+provider:
+  name: "Centers for Disease Control and Prevention (CDC)"
+  url: "https://www.cdc.gov/places"
