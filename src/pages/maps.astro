@@ -8,32 +8,18 @@ const features = collection.features as GeoMarkerFeature[];
 ---
 
 <Layout title="Community Map" description="Geographic markers for community data libraries">
-  <!-- Leaflet CSS/JS via CDN -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4Qj7v+ZtPjRrQqkKeNU5B0sB8rQkD+WfYV5b7rR/nM="
-    crossorigin=""
-  />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-VzL9bF7gCwEoEkQ3JwXj7c9bGmF+WjUZbQhVfReN+pA="
-    crossorigin=""
-  ></script>
   <section>
     <h1>Community Map</h1>
     <p>Interactive map of community data library locations, datasets, organizations, and events.</p>
 
-    <div id="map" role="region" aria-label="Community map"></div>
-
     <form id="map-filters" class="filters" aria-label="Filter markers">
       <fieldset>
         <legend>Filter by category</legend>
-        <label><input type="checkbox" name="category" value="dataset" checked /> Dataset</label>
-        <label><input type="checkbox" name="category" value="site" checked /> Site</label>
-        <label><input type="checkbox" name="category" value="organization" checked /> Organization</label>
-        <label><input type="checkbox" name="category" value="event" checked /> Event</label>
-        <label><input type="checkbox" name="category" value="other" checked /> Other</label>
+        <label><input type="checkbox" name="category" value="dataset" checked /><span class="dot" style="background:#C2410C"></span> Dataset</label>
+        <label><input type="checkbox" name="category" value="site" checked /><span class="dot" style="background:#166534"></span> Site</label>
+        <label><input type="checkbox" name="category" value="organization" checked /><span class="dot" style="background:#B45309"></span> Organization</label>
+        <label><input type="checkbox" name="category" value="event" checked /><span class="dot" style="background:#9A3412"></span> Event</label>
+        <label><input type="checkbox" name="category" value="other" checked /><span class="dot" style="background:#A8927A"></span> Other</label>
       </fieldset>
       <label class="tag-filter">
         <span>Tags contains</span>
@@ -41,15 +27,28 @@ const features = collection.features as GeoMarkerFeature[];
       </label>
     </form>
 
-    <!-- Embed GeoJSON data for client-side usage -->
-    <script type="application/json" id="geojson-data">
-      {JSON.stringify(collection)}
-    </script>
+    <div id="map" role="region" aria-label="Community map"></div>
 
-    <script>
-      // Initialize Leaflet map after DOM is ready
-      document.addEventListener('DOMContentLoaded', () => {
-        if (!window.L) return;
+    <!-- Embed GeoJSON data for client-side usage -->
+    <script type="application/json" id="geojson-data" set:html={JSON.stringify(collection)}></script>
+
+    <script is:inline>
+      // Dynamically inject Leaflet CSS + JS then call initMap via onload,
+      // ensuring both the stylesheet and library are available before we
+      // measure the container or create any Leaflet objects.
+      (function loadLeaflet() {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+
+        var s = document.createElement('script');
+        s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        s.onload = initMap;
+        document.head.appendChild(s);
+      })();
+
+      function initMap() {
         const map = L.map('map');
         // Base layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -66,13 +65,13 @@ const features = collection.features as GeoMarkerFeature[];
         const bounds = L.latLngBounds([]);
         const registry = []; // { feature, marker }
 
-        // Simple color mapping by category
+        // Color mapping by category — warm palette
         const colors = {
-          dataset: '#2563eb',
-          site: '#16a34a',
-          organization: '#7c3aed',
-          event: '#e11d48',
-          other: '#6b7280'
+          dataset: '#C2410C',   // terracotta (primary)
+          site: '#166534',      // forest green (secondary)
+          organization: '#B45309', // amber (accent)
+          event: '#9A3412',     // dark terracotta
+          other: '#A8927A'      // warm grey
         };
 
         for (const feature of data.features || []) {
@@ -100,11 +99,16 @@ const features = collection.features as GeoMarkerFeature[];
           registry.push({ feature, marker });
         }
 
-        if (bounds.isValid()) {
-          map.fitBounds(bounds.pad(0.25));
-        } else {
-          map.setView([0, 0], 2);
-        }
+        // Give the browser one tick after window.load to finalise any
+        // remaining paint work, then tell Leaflet the true container size.
+        setTimeout(() => {
+          map.invalidateSize({ animate: false });
+          if (bounds.isValid()) {
+            map.fitBounds(bounds.pad(0.25));
+          } else {
+            map.setView([20, 0], 2);
+          }
+        }, 50);
 
         // Filtering
         const form = document.getElementById('map-filters');
@@ -151,23 +155,54 @@ const features = collection.features as GeoMarkerFeature[];
 
         form?.addEventListener('change', applyFilters);
         tagInput?.addEventListener('input', applyFilters);
-      });
+      }
+
+      // initMap is called via the Leaflet script's onload — no extra trigger needed.
     </script>
 
     <style>
+      section > h1 {
+        margin-bottom: var(--space-2);
+      }
+
+      section > p:first-of-type {
+        color: var(--color-text-muted);
+        font-size: var(--font-size-sm);
+        margin-bottom: 0;
+      }
+
       #map {
         height: 520px;
         border: 1px solid var(--color-border);
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
-        margin: var(--space-4) 0;
+        box-shadow: var(--shadow-md);
+        margin: 0 0 var(--space-4);
+        /* Override Leaflet's white background */
+        background: var(--color-surface) !important;
+      }
+
+      /* Dark-ify Leaflet popup */
+      :global(.leaflet-popup-content-wrapper) {
+        background: var(--color-surface-raised) !important;
+        color: var(--color-text) !important;
+        border: 1px solid var(--color-border) !important;
+        box-shadow: var(--shadow-md) !important;
+        border-radius: var(--radius-md) !important;
+      }
+
+      :global(.leaflet-popup-tip) {
+        background: var(--color-surface-raised) !important;
+      }
+
+      :global(.leaflet-popup-content a) {
+        color: var(--color-primary) !important;
       }
 
       .filters {
         display: grid;
         gap: var(--space-4);
         grid-template-columns: 1fr;
-        margin-bottom: var(--space-4);
+        margin: var(--space-4) 0;
         background: var(--color-surface);
         border: 1px solid var(--color-border);
         border-radius: var(--radius-lg);
@@ -191,10 +226,12 @@ const features = collection.features as GeoMarkerFeature[];
       }
 
       .filters legend {
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-xs);
         font-weight: 600;
-        color: var(--color-text-muted);
-        margin-bottom: var(--space-2);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--color-text-dim);
+        margin-bottom: var(--space-3);
         width: 100%;
       }
 
@@ -203,16 +240,43 @@ const features = collection.features as GeoMarkerFeature[];
         align-items: center;
         gap: var(--space-2);
         font-size: var(--font-size-sm);
+        color: var(--color-text-muted);
         cursor: pointer;
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-sm);
+        transition: background 0.12s ease;
+      }
+
+      .filters label:hover {
+        background: var(--color-surface-raised);
+        color: var(--color-text);
+      }
+
+      .filters input[type="checkbox"] {
+        accent-color: var(--color-primary);
+        width: 14px;
+        height: 14px;
+        cursor: pointer;
+      }
+
+      .dot {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 0 6px currentColor;
       }
 
       .tag-filter {
         display: flex;
         align-items: center;
-        gap: var(--space-2);
-        font-size: var(--font-size-sm);
+        gap: var(--space-3);
+        font-size: var(--font-size-xs);
         font-weight: 600;
-        color: var(--color-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--color-text-dim);
       }
 
       .tag-filter input {
@@ -220,14 +284,22 @@ const features = collection.features as GeoMarkerFeature[];
         border-radius: var(--radius-md);
         padding: var(--space-2) var(--space-3);
         font-size: var(--font-size-sm);
-        background: var(--color-background);
+        font-family: var(--font-sans);
+        background: var(--color-surface-raised);
         color: var(--color-text);
         min-width: 160px;
+        transition: border-color 0.15s ease;
+      }
+
+      .tag-filter input:focus {
+        outline: none;
+        border-color: var(--color-primary);
       }
 
       .marker-count {
-        font-size: var(--font-size-sm);
-        color: var(--color-text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--font-size-xs);
+        color: var(--color-text-dim);
         margin-top: var(--space-2);
       }
     </style>
