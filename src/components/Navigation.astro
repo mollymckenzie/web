@@ -1,51 +1,32 @@
 ---
-// Get current pathname for active link styling
 const currentPath = Astro.url.pathname;
 
-// Navigation items
 const navItems = [
   { href: '/web/', label: 'Home' },
   { href: '/web/master-library', label: 'Master Library' },
-  { href: '/web/community-library', label: 'Community Library' },
+  { href: '/web/community-library', label: 'Community' },
   { href: '/web/maps', label: 'Map' },
   { href: '/web/data-preview', label: 'Data Preview' },
-  { href: '/web/submit', label: 'Submit' },
 ];
 
-function isActive(href: string, currentPath: string): boolean {
-  if (href === '/web/') {
-    return currentPath === '/web/' || currentPath === '/web';
-  }
-  return currentPath.startsWith(href);
+function isActive(href: string, path: string): boolean {
+  if (href === '/web/') return path === '/web/' || path === '/web';
+  return path.startsWith(href);
 }
 ---
 
 <nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="nav-container">
+
+    <!-- Brand -->
     <div class="nav-brand">
       <a href="/web/" class="brand-link">
-        <svg class="brand-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-        </svg>
-        <span class="brand-short">CDL</span>
-        <span class="brand-full">Community Data Libraries</span>
+        <span class="brand-mark">CDL</span>
+        <span class="brand-name">Community<br/>Data Libraries</span>
       </a>
     </div>
 
-    <!-- Mobile menu button -->
-    <button
-      class="mobile-menu-button"
-      aria-label="Toggle navigation menu"
-      aria-expanded="false"
-      id="mobile-menu-button"
-    >
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    </button>
-
-    <!-- Navigation links -->
+    <!-- Desktop links -->
     <ul class="nav-links" id="nav-links">
       {navItems.map((item) => (
         <li class="nav-item">
@@ -59,55 +40,83 @@ function isActive(href: string, currentPath: string): boolean {
         </li>
       ))}
     </ul>
+
+    <!-- CTA + hamburger -->
+    <div class="nav-actions">
+      <a href="/web/submit" class="nav-cta">Submit Resource</a>
+      <button
+        class="mobile-menu-button"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+        id="mobile-menu-button"
+      >
+        <span class="hb"></span>
+        <span class="hb"></span>
+        <span class="hb"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+    <ul class="mobile-links">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class={`mobile-link ${isActive(item.href, currentPath) ? 'active' : ''}`}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+      <li><a href="/web/submit" class="mobile-link mobile-link-cta">Submit a Resource →</a></li>
+    </ul>
   </div>
 </nav>
 
 <script>
-  // Mobile menu toggle functionality
-  document.addEventListener('DOMContentLoaded', () => {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const navLinks = document.getElementById('nav-links');
+  const btn = document.getElementById('mobile-menu-button');
+  const drawer = document.getElementById('mobile-drawer');
 
-    if (mobileMenuButton && navLinks) {
-      mobileMenuButton.addEventListener('click', () => {
-        const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-        mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded));
-        navLinks.classList.toggle('active');
-        mobileMenuButton.classList.toggle('active');
-      });
+  btn?.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    btn.classList.toggle('open', !open);
+    drawer?.classList.toggle('open', !open);
+    drawer?.setAttribute('aria-hidden', String(open));
+  });
 
-      // Close menu when clicking outside
-      document.addEventListener('click', (event) => {
-        const target = event.target;
-        if (!(target instanceof Element)) return;
-        if (!target.closest('.navbar')) {
-          navLinks.classList.remove('active');
-          mobileMenuButton.classList.remove('active');
-          mobileMenuButton.setAttribute('aria-expanded', 'false');
-        }
-      });
+  document.addEventListener('click', (e) => {
+    if (!(e.target instanceof Element)) return;
+    if (!e.target.closest('.navbar')) {
+      btn?.setAttribute('aria-expanded', 'false');
+      btn?.classList.remove('open');
+      drawer?.classList.remove('open');
+      drawer?.setAttribute('aria-hidden', 'true');
+    }
+  });
 
-      // Close menu on escape key
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          navLinks.classList.remove('active');
-          mobileMenuButton.classList.remove('active');
-          mobileMenuButton.setAttribute('aria-expanded', 'false');
-        }
-      });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      btn?.setAttribute('aria-expanded', 'false');
+      btn?.classList.remove('open');
+      drawer?.classList.remove('open');
+      drawer?.setAttribute('aria-hidden', 'true');
     }
   });
 </script>
 
 <style>
+  /* ── Navbar shell ─────────────────────────────── */
   .navbar {
-    background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+    background: rgba(249, 245, 238, 0.92);
     border-bottom: 1px solid var(--color-border);
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
   }
 
   .nav-container {
@@ -118,174 +127,244 @@ function isActive(href: string, currentPath: string): boolean {
     justify-content: space-between;
     align-items: center;
     gap: var(--space-4);
-    height: 60px;
+    height: 64px;
   }
 
-  .nav-brand {
-    flex-shrink: 0;
-  }
+  /* ── Brand ────────────────────────────────────── */
+  .nav-brand { flex-shrink: 0; }
 
   .brand-link {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
-    font-size: var(--font-size-base);
-    font-weight: 700;
-    color: var(--color-text);
+    gap: var(--space-3);
     text-decoration: none;
-    letter-spacing: -0.01em;
+    transition: opacity 0.15s ease;
   }
 
-  .brand-link:hover {
-    text-decoration: none;
-    color: var(--color-primary);
-  }
+  .brand-link:hover { opacity: 0.8; text-decoration: none; }
 
-  .brand-icon {
-    color: var(--color-primary);
+  .brand-mark {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: -0.04em;
+    color: #FFF8F4;
+    background: var(--color-primary);
+    padding: 0.2em 0.45em 0.18em;
+    border-radius: var(--radius-sm);
+    line-height: 1;
     flex-shrink: 0;
   }
 
-  .brand-short {
-    font-weight: 700;
-    font-size: var(--font-size-base);
-    letter-spacing: 0.02em;
-  }
-
-  .brand-full {
-    display: none;
+  .brand-name {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
     color: var(--color-text-muted);
-    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+    text-transform: uppercase;
   }
 
-  @media (min-width: 900px) {
-    .brand-short {
-      display: none;
-    }
-
-    .brand-full {
-      display: inline;
-    }
-  }
-
-  /* Mobile menu button */
-  .mobile-menu-button {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 36px;
-    height: 30px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 4px 2px;
-    z-index: 101;
-    border-radius: var(--radius-sm);
-  }
-
-  .mobile-menu-button:hover {
-    background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
-  }
-
-  .hamburger-line {
-    width: 100%;
-    height: 2px;
-    background-color: var(--color-text);
-    border-radius: 2px;
-    transition: all 0.25s ease;
-    transform-origin: center;
-  }
-
-  .mobile-menu-button.active .hamburger-line:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-  }
-
-  .mobile-menu-button.active .hamburger-line:nth-child(2) {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-
-  .mobile-menu-button.active .hamburger-line:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
-  }
-
-  /* Navigation links */
+  /* ── Desktop nav links ────────────────────────── */
   .nav-links {
-    display: flex;
+    display: none;
     list-style: none;
     gap: var(--space-1);
     margin: 0;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
-    box-shadow: var(--shadow-md);
-    flex-direction: column;
-    padding: var(--space-3) var(--space-4);
-    max-height: 0;
-    overflow: hidden;
-    transition:
-      max-height 0.3s ease,
-      padding 0.3s ease;
+    padding: 0;
   }
 
-  .nav-links.active {
-    max-height: 420px;
-    padding: var(--space-3) var(--space-4);
+  @media (min-width: 768px) {
+    .nav-links { display: flex; }
   }
 
-  .nav-item {
-    margin: 0;
-  }
+  .nav-item { margin: 0; }
 
   .nav-link {
     display: block;
     padding: var(--space-2) var(--space-3);
-    color: var(--color-text-muted);
-    font-weight: 500;
+    font-family: var(--font-sans);
     font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
     border-radius: var(--radius-md);
-    transition:
-      background-color 0.15s ease,
-      color 0.15s ease;
     text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
     white-space: nowrap;
+    position: relative;
   }
 
   .nav-link:hover {
-    background-color: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+    background: var(--color-primary-glow);
     color: var(--color-primary);
     text-decoration: none;
   }
 
   .nav-link.active {
-    background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
     color: var(--color-primary);
     font-weight: 600;
+    background: var(--color-primary-glow);
   }
 
-  /* Tablet and Desktop */
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: var(--space-3);
+    right: var(--space-3);
+    height: 2px;
+    background: var(--color-primary);
+    border-radius: 1px;
+  }
+
+  /* ── Nav actions ──────────────────────────────── */
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+  }
+
+  .nav-cta {
+    display: none;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-primary);
+    color: #FFF8F4;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    border: 1.5px solid var(--color-primary);
+  }
+
+  .nav-cta:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    box-shadow: var(--shadow-glow-primary);
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: #FFF8F4;
+  }
+
+  @media (min-width: 640px) {
+    .nav-cta { display: inline-flex; align-items: center; }
+  }
+
+  /* ── Hamburger ────────────────────────────────── */
+  .mobile-menu-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 38px;
+    height: 38px;
+    background: transparent;
+    border: 1.5px solid var(--color-border);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: border-color 0.15s ease, background 0.15s ease;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .mobile-menu-button:hover {
+    background: var(--color-primary-glow);
+    border-color: var(--color-primary);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .hb {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: var(--color-text-muted);
+    border-radius: 2px;
+    transition: all 0.22s ease;
+    transform-origin: center;
+  }
+
+  .mobile-menu-button.open .hb:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+    background: var(--color-primary);
+  }
+  .mobile-menu-button.open .hb:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  .mobile-menu-button.open .hb:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+    background: var(--color-primary);
+  }
+
   @media (min-width: 768px) {
-    .mobile-menu-button {
-      display: none;
-    }
+    .mobile-menu-button { display: none; }
+  }
 
-    .nav-links {
-      position: static;
-      flex-direction: row;
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
-      max-height: none;
-      padding: 0;
-      margin: 0;
-      overflow: visible;
-    }
+  /* ── Mobile drawer ────────────────────────────── */
+  .mobile-drawer {
+    display: none;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-4) var(--space-6);
+    box-shadow: var(--shadow-md);
+  }
 
-    .nav-link {
-      padding: var(--space-2) var(--space-3);
-    }
+  .mobile-drawer.open {
+    display: block;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-drawer { display: none !important; }
+  }
+
+  .mobile-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .mobile-link {
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .mobile-link:hover {
+    background: var(--color-primary-glow);
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .mobile-link.active {
+    color: var(--color-primary);
+    font-weight: 600;
+    background: var(--color-primary-glow);
+  }
+
+  .mobile-link-cta {
+    color: var(--color-primary);
+    font-weight: 700;
+    border: 1.5px solid var(--color-border);
+    text-align: center;
+    margin-top: var(--space-2);
+  }
+
+  .mobile-link-cta:hover {
+    background: var(--color-primary);
+    color: #FFF8F4;
+    border-color: var(--color-primary);
   }
 </style>
