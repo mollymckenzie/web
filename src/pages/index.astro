@@ -12,8 +12,7 @@ import Layout from '@layouts/Layout.astro';
   <section class="hero" aria-label="Introduction">
     <div class="hero-text">
       <div class="hero-kicker">
-        <span class="kicker-dot"></span>
-        Open-Source · K–12 Focused · Free Forever
+        Open-Source · Community-Focused · Free Forever
       </div>
 
       <h1 class="hero-title">
@@ -23,8 +22,8 @@ import Layout from '@layouts/Layout.astro';
       </h1>
 
       <p class="hero-body">
-        A curated catalog of datasets, tools, guides, and research papers —
-        filtered to your geography, organized for teachers and students.
+        A curated catalog of datasets, resources, and guides —
+        filtered to focus on your geographic community.
       </p>
 
       <div class="hero-actions">
@@ -91,12 +90,13 @@ import Layout from '@layouts/Layout.astro';
 
       <!-- Floating stat badges -->
       <div class="badge badge-1">
-        <strong>500+</strong>
-        <span>Curated resources</span>
+        <strong>100+</strong>
+        <span>Curated datasets</span>
       </div>
       <div class="badge badge-2">
-        <strong>20</strong>
-        <span>Global regions</span>
+        <span>Any</span>
+        <strong>U.S.</strong>
+        <span>Community</span>
       </div>
     </div>
   </section>
@@ -137,17 +137,14 @@ import Layout from '@layouts/Layout.astro';
 
     <div class="how-grid">
       <div class="how-step">
-        <div class="how-num">01</div>
         <h3>Curated catalog</h3>
         <p>Editors review and tag every resource — geographic coverage, audience level, statistical properties, and teaching notes included.</p>
       </div>
       <div class="how-step">
-        <div class="how-num">02</div>
         <h3>Geography-first filtering</h3>
         <p>One dataset becomes thousands of access points. Search by county, ZIP, or school district and get pre-filled API URLs for your exact location.</p>
       </div>
       <div class="how-step">
-        <div class="how-num">03</div>
         <h3>Community grows it</h3>
         <p>Teachers, students, and practitioners submit new resources. Everything is reviewed and version-controlled in Git.</p>
       </div>
@@ -164,7 +161,6 @@ import Layout from '@layouts/Layout.astro';
         <div class="fc-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         </div>
-        <div class="fc-index">01</div>
         <h2 class="fc-title">Master Library</h2>
         <p class="fc-body">Expert-curated datasets, tools, guides, and research papers — organized by theme, difficulty, and audience role.</p>
         <a href="/web/master-library" class="fc-link">
@@ -177,7 +173,6 @@ import Layout from '@layouts/Layout.astro';
         <div class="fc-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <div class="fc-index">02</div>
         <h2 class="fc-title">Community Library</h2>
         <p class="fc-body">Resources discovered and shared by practitioners, researchers, and teachers from around the world.</p>
         <a href="/web/community-library" class="fc-link">
@@ -190,7 +185,6 @@ import Layout from '@layouts/Layout.astro';
         <div class="fc-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/></svg>
         </div>
-        <div class="fc-index">03</div>
         <h2 class="fc-title">Interactive Map</h2>
         <p class="fc-body">Explore open data portals, community organizations, and events on a global map with category filters.</p>
         <a href="/web/maps" class="fc-link">
@@ -806,7 +800,7 @@ import Layout from '@layouts/Layout.astro';
     align-items: center;
     justify-content: space-between;
     gap: var(--space-8);
-    padding: var(--space-12) var(--space-10);
+    padding: var(--space-12) var(--space-16);
     background: var(--color-surface-raised);
     border: 1.5px solid var(--color-border);
     border-radius: var(--radius-xl);
