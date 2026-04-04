@@ -32,6 +32,11 @@
   status = 301
 
 [[redirects]]
+  from = "/web/"
+  to = "/"
+  status = 200
+
+[[redirects]]
   from = "/web/*"
   to = "/:splat"
   status = 200
