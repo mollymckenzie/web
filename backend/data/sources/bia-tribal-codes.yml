@@ -1,0 +1,18 @@
+id: bia-tribal-codes
+version: '1.0'
+last_updated: '2024-12-01'
+title: Bureau of Indian Affairs Tribal Codes
+short_title: BIA Tribal Codes
+description: 'Federally recognized tribe codes and American Indian/Alaska Native/Native
+  Hawaiian (AIANNH) area identifiers from the Bureau of Indian Affairs (BIA). Used
+  to identify tribal lands and link federal data to sovereign tribal geographies.
+
+  '
+provider:
+  name: Bureau of Indian Affairs (BIA)
+  agency: U.S. Department of the Interior
+  url: https://www.bia.gov/tribal-leaders-directory
+description_tags:
+- environment
+- geospatial
+- public-data

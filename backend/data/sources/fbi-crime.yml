@@ -1,0 +1,22 @@
+id: fbi-crime
+version: '1.0'
+last_updated: '2024-12-01'
+title: FBI Crime Statistics
+short_title: FBI Crime
+description: 'Crime statistics from the Federal Bureau of Investigation (FBI), including
+  Uniform Crime Reporting (UCR) offense counts by agency and county, and the National
+  Incident-Based Reporting System (NIBRS) incident-level data. Covers violent crime,
+  property crime, and arrest statistics reported by participating law enforcement
+  agencies.
+
+  '
+provider:
+  name: Federal Bureau of Investigation (FBI)
+  agency: U.S. Department of Justice
+  url: https://cde.ucr.cjis.gov
+description_tags:
+- crime
+- demographics
+- environment
+- geospatial
+- public-data

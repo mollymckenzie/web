@@ -1,0 +1,23 @@
+id: usda-agriculture
+version: '1.0'
+last_updated: '2024-12-01'
+title: USDA Agriculture Data
+short_title: USDA Agriculture
+description: 'Agricultural data from the U.S. Department of Agriculture (USDA), including
+  the Census of Agriculture (farm counts, acreage, sales by county), SNAP and food
+  assistance program participation, Rural-Urban Continuum Codes, and Economic Research
+  Service (ERS) county-level economic indicators.
+
+  '
+provider:
+  name: U.S. Department of Agriculture (USDA)
+  agency: U.S. Department of Agriculture
+  url: https://www.nass.usda.gov/AgCensus
+description_tags:
+- agriculture
+- census
+- demographics
+- economic
+- environment
+- geospatial
+- public-data

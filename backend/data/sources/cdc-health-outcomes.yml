@@ -1,0 +1,20 @@
+id: cdc-health-outcomes
+version: '1.0'
+last_updated: '2024-12-01'
+title: CDC Health Outcomes and Risk Factors
+short_title: CDC Health Outcomes
+description: 'County-level health outcomes and risk factor data from the Centers for
+  Disease Control and Prevention (CDC), including mortality rates, chronic disease
+  prevalence (diabetes, obesity, heart disease), behavioral risk factors from BRFSS,
+  and environmental health indicators.
+
+  '
+provider:
+  name: Centers for Disease Control and Prevention (CDC)
+  agency: U.S. Department of Health and Human Services
+  url: https://www.cdc.gov/datastatistics
+description_tags:
+- environment
+- geospatial
+- health
+- public-data

@@ -1,0 +1,22 @@
+id: bls-employment
+version: '1.0'
+last_updated: '2024-12-01'
+title: BLS Employment and Wages
+short_title: BLS Employment
+description: 'Employment, unemployment, and wage data from the Bureau of Labor Statistics
+  (BLS), including the Quarterly Census of Employment and Wages (QCEW), Local Area
+  Unemployment Statistics (LAUS), and Occupational Employment and Wage Statistics
+  (OEWS). Available at state, metropolitan area, and county level.
+
+  '
+provider:
+  name: Bureau of Labor Statistics (BLS)
+  agency: U.S. Department of Labor
+  url: https://www.bls.gov/data
+description_tags:
+- census
+- demographics
+- employment
+- environment
+- geospatial
+- public-data

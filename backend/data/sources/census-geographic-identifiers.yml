@@ -1,0 +1,25 @@
+id: census-geographic-identifiers
+version: '1.0'
+last_updated: '2024-12-01'
+title: Census Bureau Geographic Identifiers
+short_title: Census Geographic IDs
+description: 'FIPS codes, geographic coordinates, and Core-Based Statistical Area
+  (CBSA) definitions from the U.S. Census Bureau. Includes state, county, tract, place,
+  and ZIP Code Tabulation Area (ZCTA) identifiers used to join datasets across sources.
+
+  '
+provider:
+  name: U.S. Census Bureau
+  agency: U.S. Department of Commerce
+  url: https://www.census.gov/geographies.html
+description_tags:
+- census
+- demographics
+- economic
+- education
+- employment
+- environment
+- geospatial
+- health
+- housing
+- public-data

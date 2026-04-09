@@ -30,13 +30,23 @@ DEFAULT_SOURCES_DIR = SCRIPT_DIR.parent / "data" / "sources"
 
 
 # Keyword map, update as needed
+# words on the left are the tags that will be applied if any of the words on the right are found in the text
 TAG_RULES = {
-    "health": ["health", "cdc", "disease", "mortality", "obesity", "diabetes"],
-    "demographics": ["demographic", "population", "household", "race", "age", "sex"],
-    "census": ["census", "acs", "american community survey", "fips"],
-    "geospatial": ["county", "tract", "zip", "zcta", "state", "place", "geograph"],
+    "health": ["health", "cdc", "disease", "mortality", "obesity", "diabetes", "chronic", "brfss", "risk factor"],
+    "demographics": ["demographic", "population", "household", "race", "age", "sex", "hispanic", "origin"],
+    "census": ["census", "acs", "american community survey", "fips", "decennial"],
+    "geospatial": ["county", "tract", "zip", "zcta", "state", "place", "geograph", "boundary", "coordinate", "cbsa", "metropolitan"],
     "public-data": ["open data", "public", "government", "bureau", "cdc", "census"],
     "api": ["api", "json", "csv", "endpoint", "download"],
+    "education": ["school", "district", "nces", "lea", "student", "achievement", "naep", "enrollment", "finance"],
+    "employment": ["employment", "unemployment", "wage", "labor", "workforce", "payroll", "bls", "qcew", "laus", "occupation"],
+    "environment": ["environment", "epa", "air quality", "water", "superfund", "pollution", "emission", "toxic", "drinking water"],
+    "agriculture": ["agriculture", "farm", "crop", "usda", "rural", "livestock", "commodity"],
+    "climate": ["climate", "weather", "noaa", "temperature", "precipitation", "storm", "ncei", "normal"],
+    "crime": ["crime", "fbi", "arrest", "offense", "law enforcement", "ucr", "nibrs", "violent", "property crime"],
+    "economic": ["economic", "business", "income", "poverty", "gdp", "establishment", "naics", "revenue", "earnings"],
+    "housing": ["housing", "rent", "mortgage", "homeowner", "vacancy", "residential", "unit"],
+    "wildlife": ["bird", "species", "observation", "occurrence", "biodiversity", "wildlife", "ebird", "habitat", "checklist", "ornithology"],
 }
 
 

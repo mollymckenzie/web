@@ -50,6 +50,7 @@ const features = collection.features as GeoMarkerFeature[];
       // Initialize Leaflet map after DOM is ready
       document.addEventListener('DOMContentLoaded', () => {
         if (!window.L) return;
+        const L = window.L;
         const map = L.map('map');
         // Base layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

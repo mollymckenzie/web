@@ -1,0 +1,25 @@
+id: census-business-patterns
+version: '1.0'
+last_updated: '2024-12-01'
+title: Census County and ZIP Business Patterns
+short_title: Census Business Patterns
+description: 'Annual establishment counts, employment, and payroll data by industry
+  (NAICS) from the U.S. Census Bureau County Business Patterns (CBP) and ZIP Code
+  Business Patterns (ZBP) programs. Covers counties and ZIP Code areas nationwide.
+
+  '
+provider:
+  name: U.S. Census Bureau
+  agency: U.S. Department of Commerce
+  url: https://www.census.gov/programs-surveys/cbp.html
+description_tags:
+- census
+- demographics
+- economic
+- education
+- employment
+- environment
+- geospatial
+- health
+- housing
+- public-data
