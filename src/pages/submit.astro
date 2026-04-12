@@ -55,7 +55,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
 
         <!-- Section: Basic info -->
         <fieldset class="form-section">
-          <legend>Resource Details</legend>
+          <legend>Dataset Details</legend>
 
           <div class="field">
             <label for="title">Title <span class="required" aria-label="required">*</span></label>
@@ -86,7 +86,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
           </div>
 
           <div class="field">
-            <label for="url">Resource URL <span class="required" aria-label="required">*</span></label>
+            <label for="url">Dataset URL <span class="required" aria-label="required">*</span></label>
             <input
               type="url"
               id="url"
@@ -123,7 +123,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
 
         <!-- Section: Audience -->
         <fieldset class="form-section">
-          <legend>Intended Audience</legend>
+          <!-- <legend>Intended Audience</legend>
           <p class="fieldset-desc">Who should this resource be visible to?</p>
           <div class="checkbox-group">
             <label class="checkbox-label">
@@ -141,13 +141,14 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
               <span class="checkbox-box" aria-hidden="true"></span>
               Community Member
             </label>
-          </div>
+          </div> -->
 
+          <legend>Sensitive Content?</legend>
           <label class="toggle-label">
             <input type="checkbox" name="sensitive" value="true" />
             <span class="toggle-box" aria-hidden="true"></span>
             <span>
-              <strong>Sensitive content</strong> — this resource covers topics that may not be appropriate for all audiences (e.g., opioid data, violence statistics).
+              This resource covers topics that may not be appropriate for all audiences (e.g., opioid data, violence statistics, etc.).
             </span>
           </label>
         </fieldset>
