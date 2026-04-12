@@ -3,10 +3,10 @@ const currentPath = Astro.url.pathname;
 
 const navItems = [
   { href: '/web/', label: 'Home' },
-  { href: '/web/master-library', label: 'Master Library' },
-  { href: '/web/community-library', label: 'Community' },
-  { href: '/web/maps', label: 'Map' },
-  { href: '/web/data-preview', label: 'Data Preview' },
+  { href: '/web/master-library', label: 'Complete Dataset Catalog' },
+  { href: '/web/community-library', label: 'Example Community Library' },
+  { href: '/web/maps', label: 'Interactive Map' },
+  { href: '/web/submit', label: 'Submit Resource' },
 ];
 
 function isActive(href: string, path: string): boolean {
@@ -43,7 +43,7 @@ function isActive(href: string, path: string): boolean {
 
     <!-- CTA + hamburger -->
     <div class="nav-actions">
-      <a href="/web/submit" class="nav-cta">Submit Resource</a>
+      <a href="/web/data-preview" class="nav-cta">Create a Library for Your Community</a>
       <button
         class="mobile-menu-button"
         aria-label="Toggle navigation menu"
