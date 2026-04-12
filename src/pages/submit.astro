@@ -6,8 +6,8 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
 ---
 
 <Layout
-  title="Submit a Resource"
-  description="Contribute a dataset, tool, guide, or research paper to the Community Data Libraries collection."
+  title="Submit a Dataset"
+  description="Suggest an Open Dataset for the Community Data Libraries catalog."
 >
   <section class="submit-shell">
 
@@ -19,9 +19,9 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
         </svg>
       </div>
       <div>
-        <h1>Submit a Resource</h1>
+        <h1>Submit a Dataset</h1>
         <p class="header-desc">
-          Share a dataset, tool, guide, or research paper with the community.
+          Suggest an open dataset containing community data.
           All submissions are reviewed before publication.
         </p>
       </div>
@@ -31,7 +31,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
     {submitted && (
       <div class="success-banner" role="alert">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>Submission received — thank you! We'll review your resource and add it to the library.</span>
+        <span>Submission received — thank you! We'll review your suggested dataset shortly.</span>
       </div>
     )}
 
@@ -66,7 +66,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
               required
               minlength="3"
               maxlength="200"
-              placeholder="e.g., Chicago Open Data Portal"
+              placeholder="e.g., 1950 U.S. Census"
               autocomplete="off"
             />
           </div>
@@ -80,7 +80,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
               minlength="20"
               maxlength="1000"
               rows="4"
-              placeholder="Briefly describe what this resource is, who it's for, and why it's useful."
+              placeholder="Briefly describe what this dataset is, the key variables it contains, and why it may be interesting and/or useful to communities."
             ></textarea>
             <span class="field-hint">20–1000 characters</span>
           </div>
@@ -97,7 +97,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
             />
           </div>
 
-          <div class="field-row">
+          <!-- <div class="field-row">
             <div class="field">
               <label for="category">Category <span class="required" aria-label="required">*</span></label>
               <select id="category" name="category" required>
@@ -118,7 +118,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
                 <option value="advanced">Advanced</option>
               </select>
             </div>
-          </div>
+          </div> -->
         </fieldset>
 
         <!-- Section: Audience -->
@@ -168,7 +168,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
             <span class="field-hint">Comma-separated themes that describe the data domain.</span>
           </div>
 
-          <div class="field">
+          <!-- <div class="field">
             <label for="tags">Tags</label>
             <input
               type="text"
@@ -190,7 +190,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
               autocomplete="off"
             />
             <span class="field-hint">Tags describing how this resource can be used in teaching.</span>
-          </div>
+          </div> -->
         </fieldset>
 
         <!-- Section: Submitter info -->
