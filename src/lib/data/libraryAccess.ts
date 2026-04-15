@@ -22,12 +22,16 @@ export function canAudienceAccess(entry: MasterLibraryEntry, audience: AudienceR
     return true;
   }
 
-  if (entry.data.sensitive) {
+  if (audience === 'student' && entry.data.sensitive) {
     return false;
   }
 
   const themes = [...entry.data.dataThemes, ...entry.data.tags].map((theme) => theme.toLowerCase());
-  return !themes.some((theme) => restrictedKeywords.some((keyword) => theme.includes(keyword)));
+  if (audience === 'student') {
+    return !themes.some((theme) => restrictedKeywords.some((keyword) => theme.includes(keyword)));
+  }
+
+  return true;
 }
 
 export function audienceLabel(audience: AudienceRole): string {

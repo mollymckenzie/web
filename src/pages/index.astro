@@ -1,5 +1,13 @@
 ---
 import Layout from '@layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import submissions from '@data/community-submissions.json';
+import { withBasePath } from '@lib/paths';
+
+const catalogResources = await getCollection('master-library');
+const datasetCount = catalogResources.filter((entry) => entry.data.category === 'dataset').length;
+const communityResourceCount = submissions.length;
+const regionCount = new Set(submissions.map((entry) => entry.region)).size;
 ---
 
 <Layout
@@ -28,24 +36,24 @@ import Layout from '@layouts/Layout.astro';
       </p>
 
       <div class="hero-actions">
-        <a href="/web/master-library" class="btn-primary">
-          Explore the Library
+        <a href={withBasePath('/complete-catalog')} class="btn-primary">
+          Explore the Complete Catalog
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
-        <a href="/web/maps" class="btn-ghost">View Map</a>
+        <a href={withBasePath('/maps')} class="btn-ghost">View Map</a>
       </div>
 
       <div class="hero-roles" aria-label="Browse by role">
         <span class="roles-label">Browse as</span>
-        <a href="/web/teacher" class="role-pill">
+        <a href={withBasePath('/teacher')} class="role-pill">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
           Teacher
         </a>
-        <a href="/web/student" class="role-pill">
+        <a href={withBasePath('/student')} class="role-pill">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
           Student
         </a>
-        <a href="/web/community-member" class="role-pill">
+        <a href={withBasePath('/community-member')} class="role-pill">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Community
         </a>
@@ -91,12 +99,12 @@ import Layout from '@layouts/Layout.astro';
 
       <!-- Floating stat badges -->
       <div class="badge badge-1">
-        <strong>500+</strong>
-        <span>Curated resources</span>
+        <strong>{datasetCount}</strong>
+        <span>Curated datasets</span>
       </div>
       <div class="badge badge-2">
-        <strong>20</strong>
-        <span>Global regions</span>
+        <strong>{communityResourceCount}</strong>
+        <span>Community resources</span>
       </div>
     </div>
   </section>
@@ -106,18 +114,18 @@ import Layout from '@layouts/Layout.astro';
   ═══════════════════════════════════════════ -->
   <div class="stats-strip" aria-label="Platform statistics">
     <div class="stat-item">
-      <span class="stat-n">500+</span>
-      <span class="stat-l">Curated Resources</span>
+      <span class="stat-n">{datasetCount}</span>
+      <span class="stat-l">Datasets</span>
     </div>
     <div class="stat-sep" aria-hidden="true">·</div>
     <div class="stat-item">
-      <span class="stat-n">1,000+</span>
-      <span class="stat-l">Community Submissions</span>
+      <span class="stat-n">{communityResourceCount}</span>
+      <span class="stat-l">Community Resources</span>
     </div>
     <div class="stat-sep" aria-hidden="true">·</div>
     <div class="stat-item">
-      <span class="stat-n">20</span>
-      <span class="stat-l">Global Regions</span>
+      <span class="stat-n">{regionCount}</span>
+      <span class="stat-l">Regions</span>
     </div>
     <div class="stat-sep" aria-hidden="true">·</div>
     <div class="stat-item">
@@ -126,13 +134,18 @@ import Layout from '@layouts/Layout.astro';
     </div>
   </div>
 
+  <div class="audience-callouts" aria-label="Audience emphasis">
+    <span class="callout callout-about">About communities</span>
+    <span class="callout callout-for">For communities</span>
+  </div>
+
   <!-- ═══════════════════════════════════════════
        HOW IT WORKS  — editorial 3-column
   ═══════════════════════════════════════════ -->
   <section class="how-section" aria-label="How it works">
     <header class="section-header">
       <p class="section-eyebrow">How it works</p>
-      <h2 class="section-title">Built for classrooms.<br/>Designed for communities.</h2>
+      <h2 class="section-title">Built for classrooms.<br/><span class="section-title-accent">Designed for communities.</span></h2>
     </header>
 
     <div class="how-grid">
@@ -165,10 +178,10 @@ import Layout from '@layouts/Layout.astro';
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         </div>
         <div class="fc-index">01</div>
-        <h2 class="fc-title">Master Library</h2>
+        <h2 class="fc-title">Complete Catalog</h2>
         <p class="fc-body">Expert-curated datasets, tools, guides, and research papers — organized by theme, difficulty, and audience role.</p>
-        <a href="/web/master-library" class="fc-link">
-          Explore resources
+        <a href={withBasePath('/complete-catalog')} class="fc-link">
+          Explore the catalog
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
       </article>
@@ -180,7 +193,7 @@ import Layout from '@layouts/Layout.astro';
         <div class="fc-index">02</div>
         <h2 class="fc-title">Community Library</h2>
         <p class="fc-body">Resources discovered and shared by practitioners, researchers, and teachers from around the world.</p>
-        <a href="/web/community-library" class="fc-link">
+        <a href={withBasePath('/community-library')} class="fc-link">
           Browse community
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
@@ -193,7 +206,7 @@ import Layout from '@layouts/Layout.astro';
         <div class="fc-index">03</div>
         <h2 class="fc-title">Interactive Map</h2>
         <p class="fc-body">Explore open data portals, community organizations, and events on a global map with category filters.</p>
-        <a href="/web/maps" class="fc-link">
+        <a href={withBasePath('/maps')} class="fc-link">
           Open map
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
@@ -212,7 +225,7 @@ import Layout from '@layouts/Layout.astro';
       <p class="cta-body">Help the community by sharing datasets, tools, guides, or papers. All submissions are reviewed before publication.</p>
     </div>
     <div class="cta-actions">
-      <a href="/web/submit" class="btn-primary btn-large">Submit a Resource →</a>
+      <a href={withBasePath('/submit')} class="btn-primary btn-large">Submit a Resource →</a>
       <a href="https://github.com/community-data-libraries/web" target="_blank" rel="noopener noreferrer" class="cta-github">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
         View on GitHub
@@ -311,7 +324,7 @@ import Layout from '@layouts/Layout.astro';
     gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
     background: var(--color-primary);
-    color: #FFF8F4;
+    color: #F8FAFC;
     border: 1.5px solid var(--color-primary);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
@@ -329,7 +342,7 @@ import Layout from '@layouts/Layout.astro';
     box-shadow: var(--shadow-glow-primary);
     transform: translateY(-1px);
     text-decoration: none;
-    color: #FFF8F4;
+    color: #F8FAFC;
   }
 
   .btn-primary svg { transition: transform 0.18s ease; }
@@ -485,7 +498,7 @@ import Layout from '@layouts/Layout.astro';
   .viz-tag {
     padding: 2px 8px;
     background: var(--color-primary-glow);
-    border: 1px solid rgba(194, 65, 12, 0.2);
+    border: 1px solid rgba(15, 118, 110, 0.2);
     border-radius: var(--radius-sm);
     font-size: 0.62rem;
     font-weight: 600;
@@ -569,6 +582,37 @@ import Layout from '@layouts/Layout.astro';
     overflow: hidden;
   }
 
+  .audience-callouts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin: calc(var(--space-16) * -0.5) 0 var(--space-16);
+  }
+
+  .callout {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-4);
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .callout-about {
+    color: var(--color-secondary);
+    background: rgba(29, 78, 216, 0.08);
+    border-color: rgba(29, 78, 216, 0.2);
+  }
+
+  .callout-for {
+    color: var(--color-primary);
+    background: rgba(15, 118, 110, 0.08);
+    border-color: rgba(15, 118, 110, 0.2);
+  }
+
   /* Decorative stripe */
   .stats-strip::before {
     content: '';
@@ -642,6 +686,10 @@ import Layout from '@layouts/Layout.astro';
     letter-spacing: -0.03em;
     color: var(--color-text);
     margin: 0;
+  }
+
+  .section-title-accent {
+    color: var(--color-secondary);
   }
 
   .how-grid {
@@ -737,8 +785,8 @@ import Layout from '@layouts/Layout.astro';
   .fc-2::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--color-secondary); }
   .fc-3::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--color-accent); }
 
-  .fc-1:hover { border-color: rgba(194, 65, 12, 0.35); box-shadow: 0 12px 40px -8px rgba(194, 65, 12, 0.18); }
-  .fc-2:hover { border-color: rgba(22, 101, 52, 0.35); box-shadow: 0 12px 40px -8px rgba(22, 101, 52, 0.15); }
+  .fc-1:hover { border-color: rgba(15, 118, 110, 0.35); box-shadow: 0 12px 40px -8px rgba(15, 118, 110, 0.18); }
+  .fc-2:hover { border-color: rgba(29, 78, 216, 0.35); box-shadow: 0 12px 40px -8px rgba(29, 78, 216, 0.15); }
   .fc-3:hover { border-color: rgba(180, 83, 9, 0.35); box-shadow: 0 12px 40px -8px rgba(180, 83, 9, 0.15); }
 
   .fc-icon {

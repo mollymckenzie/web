@@ -1,6 +1,7 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import submissions from '@data/community-submissions.json';
+import { withBasePath } from '@lib/paths';
 
 // Types
 interface Submission {
@@ -25,6 +26,7 @@ const all: Submission[] = submissions;
 const rawCategory = Astro.url.searchParams.get('category') ?? '';
 const rawTheme = Astro.url.searchParams.get('theme') ?? '';
 const rawDifficulty = Astro.url.searchParams.get('difficulty') ?? '';
+const rawRegion = Astro.url.searchParams.get('region') ?? '';
 const rawQ = Astro.url.searchParams.get('q') ?? '';
 const sort = Astro.url.searchParams.get('sort') ?? 'newest';
 
@@ -32,6 +34,7 @@ const sort = Astro.url.searchParams.get('sort') ?? 'newest';
 const allCategories = Array.from(new Set(all.map(s => s.category))).sort();
 const allThemes = Array.from(new Set(all.flatMap(s => s.dataThemes))).sort();
 const allDifficulties = ['beginner', 'intermediate', 'advanced'];
+const allRegions = Array.from(new Set(all.map(s => s.region))).sort();
 
 // Apply filters
 const q = rawQ.trim().toLowerCase();
@@ -40,9 +43,10 @@ const filtered = all.filter(s => {
   const matchCat = rawCategory ? s.category === rawCategory : true;
   const matchTheme = rawTheme ? s.dataThemes.includes(rawTheme) : true;
   const matchDifficulty = rawDifficulty ? s.difficulty === rawDifficulty : true;
+  const matchRegion = rawRegion ? s.region === rawRegion : true;
   const haystack = [s.title, s.description, ...s.tags, ...s.dataThemes, s.region].join(' ').toLowerCase();
   const matchQ = q ? haystack.includes(q) : true;
-  return matchCat && matchTheme && matchDifficulty && matchQ;
+  return matchCat && matchTheme && matchDifficulty && matchRegion && matchQ;
 });
 
 // Sort
@@ -63,10 +67,11 @@ const activeFilters = [
   rawCategory ? `Category: ${rawCategory}` : '',
   rawTheme ? `Theme: ${rawTheme}` : '',
   rawDifficulty ? `Difficulty: ${rawDifficulty}` : '',
+  rawRegion ? `Region: ${rawRegion}` : '',
   rawQ ? `Search: "${rawQ}"` : '',
 ].filter(Boolean);
 
-const clearHref = '/web/community-library';
+const clearHref = withBasePath('/community-library');
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -99,10 +104,13 @@ const categoryIcons: Record<string, string> = {
         <div class="eyebrow">Community Contributed</div>
         <h1>Community Library</h1>
         <p class="cl-desc">
-          Resources discovered and shared by practitioners, researchers, teachers, and community members from around the world. These complement the <a href="/web/master-library">Master Library</a> with diverse, locally-relevant datasets and tools.
+          Resources discovered and shared by practitioners, researchers, teachers, and community members from around the world. These complement the <a href={withBasePath('/complete-catalog')}>Complete Catalog</a> with diverse, locally-relevant datasets and tools.
+        </p>
+        <p class="cl-desc">
+          Looking for a concrete implementation? Explore the <a href={withBasePath('/example-community-library')}>Example Community Library (Knox County)</a>.
         </p>
       </div>
-      <a href="/web/submit" class="button submit-cta">
+      <a href={withBasePath('/submit')} class="button submit-cta">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Submit a Resource
       </a>
@@ -136,7 +144,7 @@ const categoryIcons: Record<string, string> = {
           <button class="sidebar-close" id="cl-sidebar-close" aria-label="Close filters">✕</button>
         </div>
 
-        <form method="get" action="/web/community-library" class="cl-filters">
+        <form method="get" action={withBasePath('/community-library')} class="cl-filters">
           <div class="filter-field">
             <label for="cl-q">Search</label>
             <input type="search" id="cl-q" name="q" value={rawQ} placeholder="Title, tags, region…" />
@@ -168,6 +176,16 @@ const categoryIcons: Record<string, string> = {
               <option value="">Any difficulty</option>
               {allDifficulties.map(d => (
                 <option value={d} selected={rawDifficulty === d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="cl-region">Region</label>
+            <select id="cl-region" name="region">
+              <option value="">All regions</option>
+              {allRegions.map(r => (
+                <option value={r} selected={rawRegion === r}>{r}</option>
               ))}
             </select>
           </div>
@@ -312,7 +330,7 @@ const categoryIcons: Record<string, string> = {
             <h3>Know a great resource?</h3>
             <p>Help the community by sharing datasets, tools, guides, or papers that aren't here yet.</p>
           </div>
-          <a href="/web/submit" class="button">Submit a Resource →</a>
+          <a href={withBasePath('/submit')} class="button">Submit a Resource →</a>
         </div>
       </div>
     </div>
