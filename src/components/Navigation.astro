@@ -21,6 +21,11 @@ const dataResourcesItems = [
   { href: submitHref, label: 'Suggest a Data Resource' },
   { href: `${dataResourcesHref}#lesson-plans`, label: 'Lesson Plans & Resources' },
   { href: `${dataResourcesHref}#community-activities`, label: 'Community Activities' },
+  { href: '/web/', label: 'Home' },
+  { href: '/web/master-library', label: 'Complete Catalog' },
+  { href: '/web/submit', label: 'Data Resources' },
+  { href: '/web/maps', label: 'Interactive Map' },
+  { href: '/web/community-library', label: 'Example Community Library' },
 ];
 
 function isActive(href: string, path: string): boolean {
@@ -76,6 +81,7 @@ function isDataResourcesActive(path: string): boolean {
     <!-- CTA + hamburger -->
     <div class="nav-actions">
       <a href={submitHref} class="nav-cta">Submit Resource</a>
+      <a href="/web/data-preview" class="nav-cta">Create Your Community's Library</a>
       <button
         class="mobile-menu-button"
         aria-label="Toggle navigation menu"
@@ -117,6 +123,7 @@ function isDataResourcesActive(path: string): boolean {
         </details>
       </li>
       <li><a href={submitHref} class="mobile-link mobile-link-cta">Submit a Resource →</a></li>
+      <li><a href="/web/data-preview" class="mobile-link mobile-link-cta">Create Your Community's Library →</a></li>
     </ul>
   </div>
 </nav>
