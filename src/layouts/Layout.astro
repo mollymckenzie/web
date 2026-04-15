@@ -1,5 +1,6 @@
 ---
 import Navigation from '@components/Navigation.astro';
+import { withBasePath } from '@lib/paths';
 import '../styles/tailwind.css';
 
 interface Props {
@@ -29,7 +30,7 @@ const siteTitle =
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
 
-    <link rel="icon" type="image/svg+xml" href="/web/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={withBasePath('/favicon.svg')} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Fraunces: expressive serif for display — Outfit: clean geometric sans for body — JetBrains Mono -->
@@ -55,6 +56,11 @@ const siteTitle =
             </div>
           </div>
           <nav class="footer-links" aria-label="Footer navigation">
+            <a href={withBasePath('/complete-catalog')}>Complete Catalog</a>
+            <a href={withBasePath('/community-library')}>Community Library</a>
+            <a href={withBasePath('/maps')}>Map</a>
+            <a href={withBasePath('/data-resources')}>Data Resources</a>
+            <a href={withBasePath('/submit')}>Submit</a>
             <a href="/web/master-library">Complete Catalog</a>
             <a href="/web/submit">Data Resources</a>
             <a href="/web/maps">Interactive Map</a>
@@ -85,33 +91,33 @@ const siteTitle =
      Design System — Warm Archival
   ============================================= */
   :root {
-    /* Warm parchment palette */
-    --color-background: #F9F5EE;
+    /* Cool editorial palette */
+    --color-background: #F5F8FA;
     --color-surface: #FFFFFF;
-    --color-surface-raised: #F2EDE4;
-    --color-border: #DDD5C4;
-    --color-border-highlight: #C4B49E;
+    --color-surface-raised: #EDF4F7;
+    --color-border: #D2DEE6;
+    --color-border-highlight: #AFC4D2;
 
-    /* Brand — Burnt Sienna / Terracotta */
-    --color-primary: #C2410C;
-    --color-primary-dark: #9A3412;
-    --color-primary-light: #EA580C;
-    --color-primary-glow: rgba(194, 65, 12, 0.10);
+    /* Brand — teal / blue */
+    --color-primary: #0F766E;
+    --color-primary-dark: #115E59;
+    --color-primary-light: #14B8A6;
+    --color-primary-glow: rgba(15, 118, 110, 0.10);
 
-    /* Secondary — Deep Forest Green (complement) */
-    --color-secondary: #166534;
-    --color-secondary-light: #16a34a;
-    --color-secondary-glow: rgba(22, 101, 52, 0.10);
+    /* Secondary — cobalt */
+    --color-secondary: #1D4ED8;
+    --color-secondary-light: #3B82F6;
+    --color-secondary-glow: rgba(29, 78, 216, 0.10);
 
     /* Accent — Amber Gold */
     --color-accent: #B45309;
     --color-accent-light: #D97706;
     --color-accent-glow: rgba(180, 83, 9, 0.10);
 
-    /* Text — warm blacks & browns */
-    --color-text: #1C130C;
-    --color-text-muted: #6B5541;
-    --color-text-dim: #A8927A;
+    /* Text */
+    --color-text: #0F172A;
+    --color-text-muted: #52606D;
+    --color-text-dim: #7C8A96;
 
     /* Typography */
     --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
@@ -143,12 +149,12 @@ const siteTitle =
     --space-16: 4rem;
     --space-24: 6rem;
 
-    /* Shadows — warm-toned */
-    --shadow-sm: 0 1px 3px 0 rgba(100, 60, 20, 0.10);
-    --shadow-md: 0 4px 16px -2px rgba(100, 60, 20, 0.14);
-    --shadow-lg: 0 12px 40px -8px rgba(100, 60, 20, 0.18);
-    --shadow-glow-primary: 0 4px 20px -4px rgba(194, 65, 12, 0.28);
-    --shadow-glow-secondary: 0 4px 20px -4px rgba(22, 101, 52, 0.25);
+    /* Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.10);
+    --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.14);
+    --shadow-lg: 0 12px 40px -8px rgba(15, 23, 42, 0.18);
+    --shadow-glow-primary: 0 4px 20px -4px rgba(15, 118, 110, 0.28);
+    --shadow-glow-secondary: 0 4px 20px -4px rgba(29, 78, 216, 0.25);
     --shadow-glow-accent: 0 4px 20px -4px rgba(180, 83, 9, 0.28);
 
     /* Radii */
@@ -193,9 +199,9 @@ const siteTitle =
     background-color: var(--color-background);
     /* Subtle warm vignette */
     background-image:
-      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(194, 65, 12, 0.04) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 100% 20%, rgba(180, 83, 9, 0.03) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 50% at 0% 80%, rgba(22, 101, 52, 0.03) 0%, transparent 60%);
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(15, 118, 110, 0.05) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 100% 20%, rgba(29, 78, 216, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 0% 80%, rgba(180, 83, 9, 0.03) 0%, transparent 60%);
   }
 
   main {
@@ -268,7 +274,7 @@ const siteTitle =
     gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
     background-color: var(--color-primary);
-    color: #FFF8F4;
+    color: #F8FAFC;
     border: 1.5px solid var(--color-primary);
     border-radius: var(--radius-md);
     font-family: var(--font-sans);
@@ -287,7 +293,7 @@ const siteTitle =
     box-shadow: var(--shadow-glow-primary);
     transform: translateY(-1px);
     text-decoration: none;
-    color: #FFF8F4;
+    color: #F8FAFC;
   }
 
   /* =============================================
@@ -359,7 +365,7 @@ const siteTitle =
     letter-spacing: -0.04em;
     line-height: 1;
     padding: var(--space-2) var(--space-3);
-    border: 1.5px solid rgba(194, 65, 12, 0.4);
+    border: 1.5px solid rgba(15, 118, 110, 0.4);
     border-radius: var(--radius-sm);
     flex-shrink: 0;
     margin-top: 2px;
@@ -370,7 +376,7 @@ const siteTitle =
     font-family: var(--font-display);
     font-weight: 700;
     font-size: var(--font-size-lg);
-    color: #F5EFE8;
+    color: #E2E8F0;
     letter-spacing: -0.02em;
     margin-bottom: var(--space-1);
   }

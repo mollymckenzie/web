@@ -1,5 +1,6 @@
 ---
 import Layout from '@layouts/Layout.astro';
+import { withBasePath } from '@lib/paths';
 
 // Read search params to detect Netlify Forms success redirect
 const submitted = Astro.url.searchParams.get('submitted') === 'true';
@@ -43,7 +44,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
         method="POST"
         data-netlify="true"
         netlify-honeypot="bot-field"
-        action="/web/submit?submitted=true"
+        action={withBasePath('/submit?submitted=true')}
         class="form-card"
         novalidate
       >
@@ -288,6 +289,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
           </div>
           <div>
             <strong>No duplicates</strong>
+            <p>Check the <a href={withBasePath('/complete-catalog')}>Complete Catalog</a> first — we may already have the resource you're thinking of.</p>
             <p>Check the <a href="/web/master-library">Complete Catalog</a> first — we may already have the resource you're thinking of.</p>
           </div>
         </div>
@@ -304,6 +306,8 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
 
         <div class="review-note">
           <h3>Review Process</h3>
+          <p>Submissions are reviewed within <strong>3–5 business days</strong>. Accepted resources are added to the Complete Catalog and, where appropriate, the Community Library.</p>
+          <p>You'll receive a confirmation email if you provide one. We may reach out with clarifying questions.</p>
           <p>Submissions are reviewed regularly. Accepted resources are added to the Complete Catalog and, where relevant, the Community Library.</p>
           <p>You'll receive a confirmation email after submitting a suggestion. We may reach out with clarifying questions.</p>
         </div>
@@ -394,14 +398,14 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
     padding: 0;
     margin: 0;
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-4);
   }
 
   .form-section legend {
     font-size: var(--font-size-base);
     font-weight: 700;
     color: var(--color-text);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-2);
     padding: 0;
     letter-spacing: -0.01em;
     width: 100%;
@@ -548,7 +552,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
     top: 1px;
     width: 6px;
     height: 10px;
-    border: 2px solid #03160e;
+    border: 2px solid #F8FAFC;
     border-top: none;
     border-left: none;
     transform: rotate(45deg);

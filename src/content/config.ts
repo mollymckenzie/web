@@ -1,9 +1,9 @@
 import { defineCollection, z } from 'astro:content';
 
 /**
- * Content Collection Schema for Master Library
+ * Content Collection Schema for Complete Catalog
  *
- * This schema defines the structure for all resources in the master library.
+ * This schema defines the structure for all resources in the complete catalog.
  * Each resource is a markdown file with frontmatter metadata.
  */
 const masterLibraryCollection = defineCollection({

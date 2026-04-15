@@ -1,15 +1,52 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { withBasePath } from '@lib/paths';
 
 const all = await getCollection('master-library');
 const datasets = all.filter((entry) => entry.data.category === 'dataset');
+const selectedEntryId = (Astro.url.searchParams.get('entry') ?? '').trim();
+const selectedEntry = selectedEntryId ? datasets.find((entry) => entry.id === selectedEntryId) : undefined;
+const sourceAudience = (Astro.url.searchParams.get('audience') ?? '').trim();
 ---
 
-<Layout title="Data Preview" description="Preview of dataset entries from the master library">
+<Layout title="Data Preview" description="Preview of dataset entries from the complete catalog">
   <section class="preview-shell">
     <h1>Data Preview</h1>
-    <p class="intro">Listing datasets from the master library with native project blocks.</p>
+    <p class="intro">
+      Listing datasets from the complete catalog with native project blocks.
+      {sourceAudience && <span> Opened from the {sourceAudience} view.</span>}
+    </p>
+
+    {selectedEntry && (
+      <article class="detail-card">
+        <div class="detail-header">
+          <div>
+            <p class="eyebrow">Catalog preview</p>
+            <h2>{selectedEntry.data.title}</h2>
+          </div>
+          <a href={withBasePath('/complete-catalog')} class="button button-secondary">Back to Complete Catalog</a>
+        </div>
+        <p>{selectedEntry.data.description}</p>
+        <div class="detail-grid">
+          <div>
+            <h3>Themes</h3>
+            <p>{selectedEntry.data.dataThemes.join(', ') || 'Not specified'}</p>
+          </div>
+          <div>
+            <h3>Tags</h3>
+            <p>{selectedEntry.data.tags.join(', ') || 'Not specified'}</p>
+          </div>
+          <div>
+            <h3>Pedagogical Tags</h3>
+            <p>{selectedEntry.data.pedagogicalTags.join(', ') || 'Not specified'}</p>
+          </div>
+        </div>
+        {selectedEntry.data.url && (
+          <a href={selectedEntry.data.url} target="_blank" rel="noopener noreferrer" class="button">Visit source</a>
+        )}
+      </article>
+    )}
 
     {datasets.length === 0 ? (
       <div class="empty-state">
@@ -37,6 +74,64 @@ const datasets = all.filter((entry) => entry.data.category === 'dataset');
     .preview-shell {
       display: grid;
       gap: var(--space-6);
+    }
+
+    .detail-card {
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      display: grid;
+      gap: var(--space-4);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .detail-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      margin: 0 0 var(--space-2);
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-secondary);
+    }
+
+    .detail-card h2 {
+      margin: 0;
+      font-size: var(--font-size-2xl);
+    }
+
+    .detail-card h3 {
+      margin: 0 0 var(--space-1);
+      font-size: var(--font-size-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-dim);
+    }
+
+    .detail-card p {
+      margin: 0;
+      color: var(--color-text-muted);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .detail-grid {
+      display: grid;
+      gap: var(--space-4);
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px) {
+      .detail-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
 
     .intro {

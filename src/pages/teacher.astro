@@ -2,6 +2,7 @@
 import Layout from '@layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { extractPedagogicalTags, extractThemes } from '@lib/data/libraryAccess';
+import { withBasePath } from '@lib/paths';
 
 const resources = await getCollection('master-library');
 const dataThemes = extractThemes(resources, 'teacher');
@@ -28,7 +29,7 @@ const pedagogicalTags = extractPedagogicalTags(resources);
       </div>
     </header>
 
-    <a href="/web/master-library?audience=teacher" class="button cta-button">Open Master Library as Teacher &rarr;</a>
+    <a href={withBasePath('/complete-catalog?audience=teacher')} class="button cta-button">Open Complete Catalog as Teacher &rarr;</a>
 
     <div class="panel-grid">
       <article class="panel">

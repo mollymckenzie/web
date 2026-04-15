@@ -1,13 +1,11 @@
 /**
- * /api/master-library.json
- *
- * Legacy alias for /api/complete-catalog.json.
+ * /api/complete-catalog.json
  *
  * Static JSON endpoint exposing all complete catalog entries
  * (non-sensitive, community-accessible by default).
  *
  * Usage:
- *   GET /web/api/master-library.json
+ *   GET /web/api/complete-catalog.json
  *
  * Returns the full complete catalog collection with metadata.
  */

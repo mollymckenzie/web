@@ -2,6 +2,7 @@
 import Layout from '@layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { extractThemes } from '@lib/data/libraryAccess';
+import { withBasePath } from '@lib/paths';
 
 const resources = await getCollection('master-library');
 const dataThemes = extractThemes(resources, 'community');
@@ -29,7 +30,7 @@ const dataThemes = extractThemes(resources, 'community');
       </div>
     </header>
 
-    <a href="/web/master-library?audience=community" class="button cta-button">Open Master Library as Community Member &rarr;</a>
+    <a href={withBasePath('/complete-catalog?audience=community')} class="button cta-button">Open Complete Catalog as Community Member &rarr;</a>
 
     <article class="panel">
       <h2>Available Data Themes</h2>
