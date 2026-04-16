@@ -75,7 +75,6 @@ function isDataResourcesActive(path: string): boolean {
     <!-- CTA + hamburger -->
     <div class="nav-actions">
       <a href={submitHref} class="nav-cta">Submit Resource</a>
-      <a href={withBasePath('/data-preview')} class="nav-cta">Create Your Community's Library</a>
       <button
         class="mobile-menu-button"
         aria-label="Toggle navigation menu"
@@ -118,7 +117,6 @@ function isDataResourcesActive(path: string): boolean {
       </li>
       <li><a href={homeHref} class={`mobile-link ${isActive(homeHref, currentPath) ? 'active' : ''}`}>Home</a></li>
       <li><a href={submitHref} class="mobile-link mobile-link-cta">Submit a Resource →</a></li>
-      <li><a href={withBasePath('/data-preview')} class="mobile-link mobile-link-cta">Create Your Community's Library →</a></li>
     </ul>
   </div>
 </nav>

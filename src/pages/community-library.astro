@@ -104,10 +104,7 @@ const categoryIcons: Record<string, string> = {
         <div class="eyebrow">Community Contributed</div>
         <h1>Community Library</h1>
         <p class="cl-desc">
-          Resources discovered and shared by practitioners, researchers, teachers, and community members from around the world. These complement the <a href={withBasePath('/complete-catalog')}>Complete Catalog</a> with diverse, locally-relevant datasets and tools.
-        </p>
-        <p class="cl-desc">
-          Looking for a concrete implementation? Explore the <a href={withBasePath('/example-community-library')}>Example Community Library (Knox County)</a>.
+          Resources discovered and shared by practitioners, researchers, teachers, and community members from around the world. For a concrete implementation, explore the <a href={withBasePath('/example-community-library')}>Example Community Library (Knox County)</a>, which complements the <a href={withBasePath('/complete-catalog')}>Complete Catalog</a> with locally relevant datasets and tools.
         </p>
       </div>
       <a href={withBasePath('/submit')} class="button submit-cta">
@@ -324,14 +321,6 @@ const categoryIcons: Record<string, string> = {
           </div>
         )}
 
-        <!-- Contribute CTA -->
-        <div class="contribute-cta">
-          <div class="cta-text">
-            <h3>Know a great resource?</h3>
-            <p>Help the community by sharing datasets, tools, guides, or papers that aren't here yet.</p>
-          </div>
-          <a href={withBasePath('/submit')} class="button">Submit a Resource →</a>
-        </div>
       </div>
     </div>
   </section>
@@ -881,28 +870,5 @@ const categoryIcons: Record<string, string> = {
     .empty-state p { margin: 0; font-size: var(--font-size-sm); }
     .empty-state a { color: var(--color-secondary); }
 
-    /* ── Contribute CTA ─────────────── */
-    .contribute-cta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--space-6);
-      padding: var(--space-6) var(--space-8);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(16, 185, 129, 0.04) 100%);
-      flex-wrap: wrap;
-    }
-
-    .cta-text h3 {
-      margin: 0 0 var(--space-2);
-      font-size: var(--font-size-xl);
-    }
-
-    .cta-text p {
-      margin: 0;
-      color: var(--color-text-muted);
-      font-size: var(--font-size-sm);
-    }
   </style>
 </Layout>
