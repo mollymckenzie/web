@@ -233,7 +233,14 @@ const submitHref = withBasePath('/submit');
     }
 
     .role-card {
-      border: 1px solid var(--color-border);
+      /* Reset button defaults */
+      appearance: none;
+      -webkit-appearance: none;
+      font-family: var(--font-sans);
+      font-size: inherit;
+      width: 100%;
+      /* Card styles */
+      border: 2px solid var(--color-border);
       background: var(--color-surface);
       border-radius: var(--radius-xl);
       padding: var(--space-5);
@@ -241,8 +248,7 @@ const submitHref = withBasePath('/submit');
       gap: var(--space-2);
       text-align: left;
       cursor: pointer;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-      font-family: var(--font-sans);
+      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
     }
 
     .role-card:hover {
@@ -251,10 +257,6 @@ const submitHref = withBasePath('/submit');
     }
 
     .role-card.active {
-      border-width: 2px;
-    }
-
-    .role-card-teacher.active {
       border-color: var(--color-primary);
       background: var(--color-primary-glow);
     }
@@ -290,9 +292,9 @@ const submitHref = withBasePath('/submit');
 
     .catalog-header {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
-      gap: var(--space-4);
+      gap: var(--space-3);
       flex-wrap: wrap;
       border-bottom: 1px solid var(--color-border);
       padding-bottom: var(--space-3);
