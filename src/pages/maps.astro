@@ -45,7 +45,7 @@ const features = collection.features as GeoMarkerFeature[];
       })();
 
       function initMap() {
-        const map = L.map('map');
+        const map = L.map('map', { scrollWheelZoom: false });
         // Base layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution:
@@ -198,6 +198,7 @@ const features = collection.features as GeoMarkerFeature[];
 
       .map-shell {
         position: relative;
+        isolation: isolate;
       }
 
       #map {

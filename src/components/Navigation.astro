@@ -11,7 +11,6 @@ const dataResourcesHref = withBasePath('/data-resources');
 const submitHref = withBasePath('/submit');
 
 const navItems = [
-  { href: homeHref, label: 'Home' },
   { href: catalogHref, label: 'Complete Catalog' },
   { href: communityHref, label: 'Community' },
   { href: mapHref, label: 'Map' },
@@ -122,6 +121,7 @@ function isDataResourcesActive(path: string): boolean {
           </div>
         </details>
       </li>
+      <li><a href={homeHref} class={`mobile-link ${isActive(homeHref, currentPath) ? 'active' : ''}`}>Home</a></li>
       <li><a href={submitHref} class="mobile-link mobile-link-cta">Submit a Resource →</a></li>
       <li><a href="/web/data-preview" class="mobile-link mobile-link-cta">Create Your Community's Library →</a></li>
     </ul>

@@ -199,28 +199,26 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
         <fieldset class="form-section">
           <legend>About You <span class="optional">(optional)</span></legend>
 
-          <div class="field-row">
-            <div class="field">
-              <label for="submitter_name">Your Name</label>
-              <input
-                type="text"
-                id="submitter_name"
-                name="submitter_name"
-                placeholder="Jane Smith"
-                autocomplete="name"
-              />
-            </div>
-            <div class="field">
-              <label for="submitter_email">Email</label>
-              <input
-                type="email"
-                id="submitter_email"
-                name="submitter_email"
-                placeholder="jane@example.org"
-                autocomplete="email"
-              />
-              <span class="field-hint">We'll only contact you if we have questions about your submission.</span>
-            </div>
+          <div class="field">
+            <label for="submitter_name">Your Name</label>
+            <input
+              type="text"
+              id="submitter_name"
+              name="submitter_name"
+              placeholder="Jane Smith"
+              autocomplete="name"
+            />
+          </div>
+          <div class="field">
+            <label for="submitter_email">Email</label>
+            <input
+              type="email"
+              id="submitter_email"
+              name="submitter_email"
+              placeholder="jane@example.org"
+              autocomplete="email"
+            />
+            <span class="field-hint">We'll only contact you if we have questions about your submission.</span>
           </div>
 
           <div class="field">
@@ -429,6 +427,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-4);
+    align-items: start;
   }
 
   @media (max-width: 600px) {
@@ -440,6 +439,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
     font-weight: 600;
     color: var(--color-text);
     letter-spacing: 0.01em;
+    margin-bottom: 0;
   }
 
   .required {
