@@ -9,7 +9,7 @@ pedagogicalTags: ['intro-lesson', 'scaffolded-learning', 'assessment-ready']
 audienceAccess: { teacher: true, student: true, community: true }
 sensitive: false
 url: 'https://www.statlearning.com/'
-featured: false
+# featured: false
 ---
 
 # A Gentle Introduction to Statistical Learning

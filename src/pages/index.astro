@@ -157,11 +157,10 @@ const regionCount = new Set(submissions.map((entry) => entry.region)).size;
     <header class="section-header">
       <p class="section-eyebrow">How it works</p>
       <h2 class="section-title">Built for classrooms.<br/><span class="section-title-accent">Designed for communities.</span></h2>
-      <h2 class="section-title">Built for classrooms and communities.</h2>
     </header>
 
     <p class="how-section">
-        Follow our instructions to <a href="/web/data-preview">create a library</a> for your community. No technical expertise is needed. Your community library will be created, continuously updated, and available automatically.
+        Follow our instructions to <a href={withBasePath('/data-preview')}>create a library</a> for your community. No technical expertise is needed. Your community library will be created, continuously updated, and available automatically.
     </p>
 
     <div class="how-grid">
@@ -175,7 +174,7 @@ const regionCount = new Set(submissions.map((entry) => entry.region)).size;
       </div>
       <div class="how-step">
         <h3>Community accessibility</h3>
-        <p>Everyone can suggeset new data resources. Suggestions are reviewed and rolled out in regular library updates. Community libraries stay up-to-date.</p>
+        <p>Everyone can suggest new data resources. Suggestions are reviewed and rolled out in regular library updates. Community libraries stay up-to-date.</p>
       </div>
     </div>
   </section>

@@ -9,7 +9,7 @@ pedagogicalTags: ['classroom-lab', 'project-based-learning', 'model-evaluation']
 audienceAccess: { teacher: true, student: true, community: true }
 sensitive: false
 url: 'https://archive.ics.uci.edu/ml/index.php'
-featured: true
+# featured: true
 ---
 
 # UCI Machine Learning Repository

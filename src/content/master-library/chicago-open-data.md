@@ -6,12 +6,10 @@ publishedDate: 2025-09-20
 tags: ['open-data', 'civic-data', 'public-health', 'city-data', 'opioid']
 dataThemes: ['civic operations', 'public health', 'opioid addiction', 'urban safety']
 pedagogicalTags: ['case-study', 'critical-data-literacy', 'policy-analysis']
-category: 'dataset'
 audienceAccess: { teacher: true, student: false, community: false }
 sensitive: true
 url: 'https://data.cityofchicago.org/'
-featured: true
-difficulty: 'intermediate'
+# featured: true
 ---
 
 # Chicago Open Data Portal

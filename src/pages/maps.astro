@@ -1,10 +1,8 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { loadGeoMarkers } from '@lib/data/geo';
-import type { GeoMarkerFeature } from '@lib/types/geo';
 
 const collection = loadGeoMarkers();
-const features = collection.features as GeoMarkerFeature[];
 ---
 
 <Layout title="Community Map" description="Geographic markers for community data libraries">
