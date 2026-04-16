@@ -3,6 +3,7 @@ import Layout from '@layouts/Layout.astro';
 import { loadGeoMarkers } from '@lib/data/geo';
 
 const collection = loadGeoMarkers();
+const markerCount = Array.isArray(collection.features) ? collection.features.length : 0;
 ---
 
 <Layout title="Community Map" description="Geographic markers for community data libraries">
@@ -312,6 +313,6 @@ const collection = loadGeoMarkers();
       }
     </style>
 
-    <p class="marker-count">{features.length} location{features.length !== 1 ? 's' : ''} plotted on the map.</p>
+    <p class="marker-count">{markerCount} location{markerCount !== 1 ? 's' : ''} plotted on the map.</p>
   </section>
 </Layout>
