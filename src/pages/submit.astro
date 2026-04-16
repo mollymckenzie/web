@@ -7,8 +7,8 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
 ---
 
 <Layout
-  title="Submit a Resource"
-  description="Contribute a dataset, tool, guide, or research paper to the Community Data Libraries collection."
+  title="Submit a Dataset"
+  description="Suggest an Open Dataset for the Community Data Libraries catalog."
 >
   <section class="submit-shell">
 
@@ -20,9 +20,9 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
         </svg>
       </div>
       <div>
-        <h1>Submit a Resource</h1>
+        <h1>Submit a Dataset</h1>
         <p class="header-desc">
-          Share a dataset, tool, guide, or research paper with the community.
+          Suggest an open dataset containing community data.
           All submissions are reviewed before publication.
         </p>
       </div>
@@ -32,7 +32,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
     {submitted && (
       <div class="success-banner" role="alert">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>Submission received — thank you! We'll review your resource and add it to the library.</span>
+        <span>Submission received — thank you! We'll review your suggested dataset shortly.</span>
       </div>
     )}
 
@@ -56,7 +56,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
 
         <!-- Section: Basic info -->
         <fieldset class="form-section">
-          <legend>Resource Details</legend>
+          <legend>Dataset Details</legend>
 
           <div class="field">
             <label for="title">Title <span class="required" aria-label="required">*</span></label>
@@ -67,7 +67,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
               required
               minlength="3"
               maxlength="200"
-              placeholder="e.g., Chicago Open Data Portal"
+              placeholder="e.g., 1950 U.S. Census"
               autocomplete="off"
             />
           </div>
@@ -81,13 +81,13 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
               minlength="20"
               maxlength="1000"
               rows="4"
-              placeholder="Briefly describe what this resource is, who it's for, and why it's useful."
+              placeholder="Briefly describe what this dataset is, the key variables it contains, and why it may be interesting and/or useful to communities."
             ></textarea>
             <span class="field-hint">20–1000 characters</span>
           </div>
 
           <div class="field">
-            <label for="url">Resource URL <span class="required" aria-label="required">*</span></label>
+            <label for="url">Dataset URL <span class="required" aria-label="required">*</span></label>
             <input
               type="url"
               id="url"
@@ -98,7 +98,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
             />
           </div>
 
-          <div class="field-row">
+          <!-- <div class="field-row">
             <div class="field">
               <label for="category">Category <span class="required" aria-label="required">*</span></label>
               <select id="category" name="category" required>
@@ -119,12 +119,12 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
                 <option value="advanced">Advanced</option>
               </select>
             </div>
-          </div>
+          </div> -->
         </fieldset>
 
         <!-- Section: Audience -->
         <fieldset class="form-section">
-          <legend>Intended Audience</legend>
+          <!-- <legend>Intended Audience</legend>
           <p class="fieldset-desc">Who should this resource be visible to?</p>
           <div class="checkbox-group">
             <label class="checkbox-label">
@@ -142,13 +142,14 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
               <span class="checkbox-box" aria-hidden="true"></span>
               Community Member
             </label>
-          </div>
+          </div> -->
 
+          <legend>Sensitive Content?</legend>
           <label class="toggle-label">
             <input type="checkbox" name="sensitive" value="true" />
             <span class="toggle-box" aria-hidden="true"></span>
             <span>
-              <strong>Sensitive content</strong> — this resource covers topics that may not be appropriate for all audiences (e.g., opioid data, violence statistics).
+              This resource covers topics that may not be appropriate for all audiences (e.g., opioid data, violence statistics, etc.).
             </span>
           </label>
         </fieldset>
@@ -169,7 +170,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
             <span class="field-hint">Comma-separated themes that describe the data domain.</span>
           </div>
 
-          <div class="field">
+          <!-- <div class="field">
             <label for="tags">Tags</label>
             <input
               type="text"
@@ -191,7 +192,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
               autocomplete="off"
             />
             <span class="field-hint">Tags describing how this resource can be used in teaching.</span>
-          </div>
+          </div> -->
         </fieldset>
 
         <!-- Section: Submitter info -->
@@ -237,11 +238,11 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
         <div class="form-footer">
           <p class="form-notice">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            Submissions are reviewed by our editorial team. By submitting, you confirm this resource is publicly available and appropriately licensed.
+            Submissions are reviewed by our editorial team. By submitting, you confirm this dataset is publicly available and appropriately licensed.
           </p>
           <button type="submit" class="button submit-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            Submit Resource
+            Submit Dataset
           </button>
         </div>
       </form>
@@ -256,7 +257,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
           </div>
           <div>
             <strong>Publicly accessible</strong>
-            <p>Resources must be freely available online, or clearly document any access requirements.</p>
+            <p>Datasets must be freely available online. Clearly document any access requirements.</p>
           </div>
         </div>
 
@@ -270,7 +271,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
           </div>
         </div>
 
-        <div class="guideline-item">
+        <!-- <div class="guideline-item">
           <div class="guideline-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
@@ -278,7 +279,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
             <strong>Relevant to data science education</strong>
             <p>Resources should be useful for learning, teaching, or applying data science and related disciplines.</p>
           </div>
-        </div>
+        </div> -->
 
         <div class="guideline-item">
           <div class="guideline-icon">
@@ -287,6 +288,7 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
           <div>
             <strong>No duplicates</strong>
             <p>Check the <a href={withBasePath('/complete-catalog')}>Complete Catalog</a> first — we may already have the resource you're thinking of.</p>
+            <p>Check the <a href="/web/master-library">Complete Catalog</a> first — we may already have the resource you're thinking of.</p>
           </div>
         </div>
 
@@ -304,6 +306,8 @@ const submitted = Astro.url.searchParams.get('submitted') === 'true';
           <h3>Review Process</h3>
           <p>Submissions are reviewed within <strong>3–5 business days</strong>. Accepted resources are added to the Complete Catalog and, where appropriate, the Community Library.</p>
           <p>You'll receive a confirmation email if you provide one. We may reach out with clarifying questions.</p>
+          <p>Submissions are reviewed regularly. Accepted resources are added to the Complete Catalog and, where relevant, the Community Library.</p>
+          <p>You'll receive a confirmation email after submitting a suggestion. We may reach out with clarifying questions.</p>
         </div>
       </aside>
     </div>
