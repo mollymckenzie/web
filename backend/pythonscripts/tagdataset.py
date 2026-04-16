@@ -4,20 +4,20 @@ Simple dataset tagger.
 
 What it does:
 - Reads one or more YAML files from backend/data/sources
+- Uses the requests library to fetch text content from any URLs found in the YAML
 - Collects text from YAML fields + URL page content
 - Generates simple keyword-based description tags
 - Writes tags back to each file as: description_tags: [..]
 
 Usage:
-    python backend/pythonscripts/tagdataset.py
-    python backend/pythonscripts/tagdataset.py --file backend/data/sources/cdc-places-health.yml
-    python backend/pythonscripts/tagdataset.py --dry-run
+    python backend/pythonscripts/tagdataset.py all
+    python backend/pythonscripts/tagdataset.py usda-milk-production.yml
 """
 
 from __future__ import annotations
 
-import argparse
 import re
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -48,21 +48,6 @@ TAG_RULES = {
     "housing": ["housing", "rent", "mortgage", "homeowner", "vacancy", "residential", "unit"],
     "wildlife": ["bird", "species", "observation", "occurrence", "biodiversity", "wildlife", "ebird", "habitat", "checklist", "ornithology"],
 }
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Generate description tags for dataset YAML files.")
-    parser.add_argument(
-        "--sources-dir",
-        default=str(DEFAULT_SOURCES_DIR),
-        help="Folder containing .yml files (default: backend/data/sources)",
-    )
-    parser.add_argument("--file", help="Optional single YAML file to process")
-    parser.add_argument("--timeout", type=int, default=10, help="HTTP timeout in seconds")
-    parser.add_argument("--max-url-text", type=int, default=4000, help="Max chars to read per URL")
-    parser.add_argument("--dry-run", action="store_true", help="Show tags but do not write files")
-    return parser.parse_args()
-
 
 def find_yaml_files(sources_dir: Path, one_file: str | None) -> list[Path]:
     if one_file:
@@ -164,16 +149,29 @@ def process_file(path: Path, timeout: int, max_url_text: int, dry_run: bool) -> 
 
 
 def main() -> None:
-    args = parse_args()
-    sources_dir = Path(args.sources_dir)
-    files = find_yaml_files(sources_dir=sources_dir, one_file=args.file)
+    if len(sys.argv) < 2:
+        print("Usage:")
+        print("  python backend/pythonscripts/tagdataset.py all")
+        print("  python backend/pythonscripts/tagdataset.py path/to/dataset.yml")
+        sys.exit(1)
+
+    target = sys.argv[1]
+
+    if target == "all":
+        files = find_yaml_files(sources_dir=DEFAULT_SOURCES_DIR, one_file=None)
+    else:
+        #accept filename or path
+        target_path = Path(target)
+        if not target_path.is_absolute() and not target_path.exists():
+            target_path = DEFAULT_SOURCES_DIR / target_path
+        files = find_yaml_files(sources_dir=DEFAULT_SOURCES_DIR, one_file=str(target_path))
 
     if not files:
         print("No YAML files found.")
         return
 
     for path in files:
-        process_file(path=path, timeout=args.timeout, max_url_text=args.max_url_text, dry_run=args.dry_run)
+        process_file(path=path, timeout=10, max_url_text=4000, dry_run=False)
 
 
 if __name__ == "__main__":
