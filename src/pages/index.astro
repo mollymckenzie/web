@@ -25,9 +25,7 @@ const regionCount = new Set(submissions.map((entry) => entry.region)).size;
       </div>
 
       <h1 class="hero-title">
-        Where<br/>
-        <em>communities</em><br/>
-        find their data.
+        Data <em class="word-about">about</em> the community <em class="word-for">for</em> the community.
       </h1>
 
       <p class="hero-body">
@@ -135,8 +133,9 @@ const regionCount = new Set(submissions.map((entry) => entry.region)).size;
   </div>
 
   <div class="audience-callouts" aria-label="Audience emphasis">
-    <span class="callout callout-about">About communities</span>
-    <span class="callout callout-for">For communities</span>
+    <p class="audience-statement">
+      Data <em class="word-about">about</em> the community <em class="word-for">for</em> the community.
+    </p>
   </div>
 
   <!-- ═══════════════════════════════════════════
@@ -583,34 +582,27 @@ const regionCount = new Set(submissions.map((entry) => entry.region)).size;
   }
 
   .audience-callouts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
     margin: calc(var(--space-16) * -0.5) 0 var(--space-16);
   }
 
-  .callout {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--space-2) var(--space-4);
-    border-radius: 999px;
-    border: 1px solid var(--color-border);
-    font-size: var(--font-size-xs);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  .audience-statement {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--color-text);
+    margin: 0;
   }
 
-  .callout-about {
-    color: var(--color-secondary);
-    background: rgba(29, 78, 216, 0.08);
-    border-color: rgba(29, 78, 216, 0.2);
-  }
-
-  .callout-for {
+  .word-about {
+    font-style: italic;
     color: var(--color-primary);
-    background: rgba(15, 118, 110, 0.08);
-    border-color: rgba(15, 118, 110, 0.2);
+  }
+
+  .word-for {
+    font-style: italic;
+    color: var(--color-secondary);
   }
 
   /* Decorative stripe */
