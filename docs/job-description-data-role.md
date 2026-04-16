@@ -1,10 +1,10 @@
 # Job Description — Community Data Librarian (CDL)
 
 ## Overview
-We are seeking a Community Data Librarian to curate, document, and steward datasets and tools within the Community Data Libraries (CDL) initiative. This role collaborates with contributors, ensures high-quality metadata, and helps maintain transparent, ethical data practices.
+We are seeking a Community Data Librarian to curate, document, and steward datasets within the Community Data Libraries (CDL) initiative. This role collaborates with contributors, ensures high-quality metadata, and helps maintain transparent, ethical data practices.
 
 ## Responsibilities
-- Curate and maintain the CDL master and community libraries (datasets, tools, guides).
+- Curate and maintain the CDL complete catalog and community libraries.
 - Ensure each dataset includes a completed datasheet (see docs/templates/datasheet-template.md).
 - Coordinate geographic identifiers and mapping resources under data/geo/.
 - Review and validate contributions for schema compliance (src/content/config.ts).

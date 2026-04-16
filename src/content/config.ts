@@ -6,7 +6,7 @@ import { defineCollection, z } from 'astro:content';
  * This schema defines the structure for all resources in the complete catalog.
  * Each resource is a markdown file with frontmatter metadata.
  */
-const masterLibraryCollection = defineCollection({
+const completeCatalogCollection = defineCollection({
   type: 'content',
   schema: z.object({
     // Required fields
@@ -21,7 +21,6 @@ const masterLibraryCollection = defineCollection({
     tags: z.array(z.string()).default([]),
     dataThemes: z.array(z.string()).default([]),
     pedagogicalTags: z.array(z.string()).default([]),
-    category: z.enum(['dataset', 'tool', 'guide', 'paper']),
     audienceAccess: z
       .object({
         teacher: z.boolean().default(true),
@@ -41,7 +40,6 @@ const masterLibraryCollection = defineCollection({
 
     // Additional optional fields
     featured: z.boolean().default(false),
-    difficulty: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
     language: z.string().optional(),
   }),
 });
@@ -51,5 +49,5 @@ const masterLibraryCollection = defineCollection({
  * Collections are automatically available in Astro via the content collections API
  */
 export const collections = {
-  'master-library': masterLibraryCollection,
+  'complete-catalog': completeCatalogCollection,
 };

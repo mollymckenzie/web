@@ -6,12 +6,10 @@ publishedDate: 2023-01-15
 tags: ['machine-learning', 'datasets', 'classification', 'regression', 'research']
 dataThemes: ['machine learning', 'classification', 'regression', 'open datasets']
 pedagogicalTags: ['classroom-lab', 'project-based-learning', 'model-evaluation']
-category: 'dataset'
 audienceAccess: { teacher: true, student: true, community: true }
 sensitive: false
 url: 'https://archive.ics.uci.edu/ml/index.php'
 featured: true
-difficulty: 'beginner'
 ---
 
 # UCI Machine Learning Repository

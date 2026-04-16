@@ -6,12 +6,10 @@ publishedDate: 2023-11-20
 tags: ['statistics', 'machine-learning', 'tutorial', 'education', 'beginner-friendly']
 dataThemes: ['statistics', 'machine learning fundamentals', 'model evaluation']
 pedagogicalTags: ['intro-lesson', 'scaffolded-learning', 'assessment-ready']
-category: 'guide'
 audienceAccess: { teacher: true, student: true, community: true }
 sensitive: false
 url: 'https://www.statlearning.com/'
 featured: false
-difficulty: 'beginner'
 ---
 
 # A Gentle Introduction to Statistical Learning
