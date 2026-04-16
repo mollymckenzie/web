@@ -80,9 +80,7 @@ function formatDate(date: Date | undefined): string {
         <h2>Filters</h2>
         <button class="sidebar-close" id="sidebar-close" aria-label="Close filters">✕</button>
       </div>
-      <form method="get" action={withBasePath('/complete-catalog')} class="filters-form">
-        <!-- audience is set by JS before submit so the URL preserves the selected view -->
-        <input type="hidden" name="audience" id="hidden-audience" value="community" />
+      <form class="filters-form" id="catalog-filter-form">
 
         <label>
           <span>Search</span>
@@ -120,7 +118,7 @@ function formatDate(date: Date | undefined): string {
 
         <div class="filter-actions">
           <button type="submit" class="button">Apply</button>
-          <a href={clearFiltersHref} class="reset-link">Reset</a>
+          <button type="button" class="reset-link" id="catalog-reset-btn">Reset</button>
         </div>
       </form>
     </aside>
@@ -198,7 +196,14 @@ function formatDate(date: Date | undefined): string {
                 const previewHref = withBasePath(`/data-preview?entry=${encodeURIComponent(resource.id)}&audience=AUDIENCE_PLACEHOLDER`);
                 const resourceAudiences = getResourceAudiences(resource);
                 return (
-                  <article class="result-card" data-audiences={resourceAudiences}>
+                  <article
+                    class="result-card"
+                    data-audiences={resourceAudiences}
+                    data-title={resource.data.title}
+                    data-search={[resource.data.title, resource.data.description, ...themes].join(' ').toLowerCase()}
+                    data-themes={themes.join('|')}
+                    data-date={resource.data.publishedDate ? new Date(resource.data.publishedDate).getTime() : 0}
+                  >
                     <div class="result-main">
                       <h3>
                         <a href={previewHref} class="preview-link">{resource.data.title}</a>
@@ -236,7 +241,13 @@ function formatDate(date: Date | undefined): string {
                     const previewHref = withBasePath(`/data-preview?entry=${encodeURIComponent(resource.id)}&audience=AUDIENCE_PLACEHOLDER`);
                     const resourceAudiences = getResourceAudiences(resource);
                     return (
-                      <tr data-audiences={resourceAudiences}>
+                      <tr
+                        data-audiences={resourceAudiences}
+                        data-title={resource.data.title}
+                        data-search={[resource.data.title, resource.data.description, ...themes].join(' ').toLowerCase()}
+                        data-themes={themes.join('|')}
+                        data-date={resource.data.publishedDate ? new Date(resource.data.publishedDate).getTime() : 0}
+                      >
                         <td class="td-title">
                           <a href={previewHref} class="preview-link">{resource.data.title}</a>
                         </td>
@@ -362,15 +373,7 @@ function formatDate(date: Date | undefined): string {
       });
 
       // Update resource count
-      if (resourceCountEl) {
-        const allCards = section.querySelectorAll<HTMLElement>('.result-card:not(.empty)');
-        let count = 0;
-        allCards.forEach((card) => {
-          const audiences = (card.dataset.audiences ?? '').split(' ');
-          if (audiences.includes(audience)) count++;
-        });
-        resourceCountEl.innerHTML = `<strong>${count}</strong> resources`;
-      }
+      updateCatalogCount();
     }
 
     // Intercept audience link/card clicks — update URL via pushState, no reload
@@ -394,6 +397,88 @@ function formatDate(date: Date | undefined): string {
     // Apply audience on page load from URL
     const initialAudience = new URLSearchParams(window.location.search).get('audience') ?? 'community';
     applyAudience(initialAudience);
+
+    // ── Client-side filters (theme, search, sort) ──────────────
+    const filterForm    = document.getElementById('catalog-filter-form') as HTMLFormElement | null;
+    const searchInput   = filterForm?.querySelector<HTMLInputElement>('[name="q"]') ?? null;
+    const themeSelect   = filterForm?.querySelector<HTMLSelectElement>('[name="theme"]') ?? null;
+    const sortSelect    = filterForm?.querySelector<HTMLSelectElement>('[name="sort"]') ?? null;
+    const resetBtn      = document.getElementById('catalog-reset-btn');
+    const pedagFilterEl = document.getElementById('pedagogical-tag-filter');
+    const pedagSelect   = filterForm?.querySelector<HTMLSelectElement>('[name="pedagogicalTag"]') ?? null;
+    const cardsView     = document.querySelector<HTMLElement>('.cards-view');
+    const tableBody     = document.querySelector<HTMLElement>('.table-view tbody');
+
+    function applyFilters() {
+      const q     = searchInput?.value.trim().toLowerCase() ?? '';
+      const theme = themeSelect?.value ?? '';
+      const sort  = sortSelect?.value ?? 'updated';
+      const ptag  = pedagSelect?.value ?? '';
+
+      // Filter cards
+      const cards = Array.from(document.querySelectorAll<HTMLElement>('.result-card:not(.empty)'));
+      cards.forEach(card => {
+        const search = card.dataset.search ?? '';
+        const themes = (card.dataset.themes ?? '').split('|').filter(Boolean);
+        const ok = (!q || search.includes(q)) && (!theme || themes.includes(theme));
+        card.classList.toggle('filtered-out', !ok);
+      });
+
+      // Filter table rows
+      const rows = Array.from(document.querySelectorAll<HTMLElement>('tr[data-audiences]'));
+      rows.forEach(row => {
+        const search = row.dataset.search ?? '';
+        const themes = (row.dataset.themes ?? '').split('|').filter(Boolean);
+        const ok = (!q || search.includes(q)) && (!theme || themes.includes(theme));
+        row.classList.toggle('filtered-out', !ok);
+      });
+
+      // Sort cards view
+      if (cardsView) {
+        const sortable = cards.slice().sort((a, b) => {
+          if (sort === 'title') return (a.dataset.title ?? '').localeCompare(b.dataset.title ?? '');
+          return Number(b.dataset.date ?? '0') - Number(a.dataset.date ?? '0');
+        });
+        sortable.forEach(c => cardsView.appendChild(c));
+      }
+
+      // Sort table rows
+      if (tableBody) {
+        const sortableRows = rows.slice().sort((a, b) => {
+          if (sort === 'title') return (a.dataset.title ?? '').localeCompare(b.dataset.title ?? '');
+          return Number(b.dataset.date ?? '0') - Number(a.dataset.date ?? '0');
+        });
+        sortableRows.forEach(r => tableBody.appendChild(r));
+      }
+
+      updateCatalogCount();
+    }
+
+    function updateCatalogCount() {
+      if (!section || !resourceCountEl) return;
+      const audience = section.dataset.audience ?? 'community';
+      const cards = section.querySelectorAll<HTMLElement>('.result-card:not(.empty)');
+      let count = 0;
+      cards.forEach(card => {
+        const audiences = (card.dataset.audiences ?? '').split(' ');
+        if (audiences.includes(audience) && !card.classList.contains('filtered-out')) count++;
+      });
+      resourceCountEl.innerHTML = `<strong>${count}</strong> resources`;
+    }
+
+    filterForm?.addEventListener('submit', (e) => { e.preventDefault(); applyFilters(); });
+    searchInput?.addEventListener('input', applyFilters);
+    themeSelect?.addEventListener('change', applyFilters);
+    sortSelect?.addEventListener('change', applyFilters);
+    pedagSelect?.addEventListener('change', applyFilters);
+
+    resetBtn?.addEventListener('click', () => {
+      if (searchInput)  searchInput.value = '';
+      if (themeSelect)  themeSelect.value = '';
+      if (sortSelect)   sortSelect.value = 'updated';
+      if (pedagSelect)  pedagSelect.value = '';
+      applyFilters();
+    });
   </script>
 
   <style>
@@ -776,6 +861,10 @@ function formatDate(date: Date | undefined): string {
       letter-spacing: 0.07em;
       color: var(--color-text-dim);
     }
+
+    /* ── Filter-driven visibility ──────────────────── */
+    .result-card.filtered-out { display: none !important; }
+    tr[data-audiences].filtered-out { display: none !important; }
 
     /* ── Audience-based card visibility (CSS-driven) ─ */
     #results-section[data-audience="teacher"] .result-card:not([data-audiences~="teacher"]) { display: none; }

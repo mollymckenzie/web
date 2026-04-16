@@ -23,63 +23,20 @@ interface Submission {
 const all: Submission[] = submissions;
 
 // Read filter params from query string
-const rawCategory = Astro.url.searchParams.get('category') ?? '';
-const rawTheme = Astro.url.searchParams.get('theme') ?? '';
-const rawDifficulty = Astro.url.searchParams.get('difficulty') ?? '';
-const rawRegion = Astro.url.searchParams.get('region') ?? '';
-const rawQ = Astro.url.searchParams.get('q') ?? '';
-const sort = Astro.url.searchParams.get('sort') ?? 'newest';
-
-// Derive filter options
+// Derive filter options for populating selects (server-rendered, all items)
 const allCategories = Array.from(new Set(all.map(s => s.category))).sort();
 const allThemes = Array.from(new Set(all.flatMap(s => s.dataThemes))).sort();
-const allDifficulties = ['beginner', 'intermediate', 'advanced'];
 const allRegions = Array.from(new Set(all.map(s => s.region))).sort();
 
-// Apply filters
-const q = rawQ.trim().toLowerCase();
-
-const filtered = all.filter(s => {
-  const matchCat = rawCategory ? s.category === rawCategory : true;
-  const matchTheme = rawTheme ? s.dataThemes.includes(rawTheme) : true;
-  const matchDifficulty = rawDifficulty ? s.difficulty === rawDifficulty : true;
-  const matchRegion = rawRegion ? s.region === rawRegion : true;
-  const haystack = [s.title, s.description, ...s.tags, ...s.dataThemes, s.region].join(' ').toLowerCase();
-  const matchQ = q ? haystack.includes(q) : true;
-  return matchCat && matchTheme && matchDifficulty && matchRegion && matchQ;
-});
-
-// Sort
-const sorted = [...filtered].sort((a, b) => {
-  if (sort === 'title') return a.title.localeCompare(b.title);
-  if (sort === 'difficulty') {
-    const order = ['beginner', 'intermediate', 'advanced'];
-    return order.indexOf(a.difficulty) - order.indexOf(b.difficulty);
-  }
-  // newest (default)
-  return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime();
-});
-
-
-const activeFilters = [
-  rawCategory ? `Category: ${rawCategory}` : '',
-  rawTheme ? `Theme: ${rawTheme}` : '',
-  rawDifficulty ? `Difficulty: ${rawDifficulty}` : '',
-  rawRegion ? `Region: ${rawRegion}` : '',
-  rawQ ? `Search: "${rawQ}"` : '',
-].filter(Boolean);
+// Render all items — filtering is handled client-side
+const sorted = [...all].sort((a, b) =>
+  new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+);
 
 const clearHref = withBasePath('/community-library');
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-}
-
-function difficultyColor(d: string) {
-  if (d === 'beginner') return 'chip-green';
-  if (d === 'intermediate') return 'chip-yellow';
-  if (d === 'advanced') return 'chip-red';
-  return '';
 }
 
 const categoryIcons: Record<string, string> = {
@@ -139,10 +96,10 @@ const categoryIcons: Record<string, string> = {
           <button class="sidebar-close" id="cl-sidebar-close" aria-label="Close filters">✕</button>
         </div>
 
-        <form method="get" action={withBasePath('/community-library')} class="cl-filters">
+        <form class="cl-filters" id="cl-filter-form">
           <div class="filter-field">
             <label for="cl-q">Search</label>
-            <input type="search" id="cl-q" name="q" value={rawQ} placeholder="Title, tags, region…" />
+            <input type="search" id="cl-q" name="q" placeholder="Title, tags, region…" />
           </div>
 
           <div class="filter-field">
@@ -150,7 +107,7 @@ const categoryIcons: Record<string, string> = {
             <select id="cl-cat" name="category">
               <option value="">All categories</option>
               {allCategories.map(c => (
-                <option value={c} selected={rawCategory === c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+                <option value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
               ))}
             </select>
           </div>
@@ -160,17 +117,7 @@ const categoryIcons: Record<string, string> = {
             <select id="cl-theme" name="theme">
               <option value="">All themes</option>
               {allThemes.map(t => (
-                <option value={t} selected={rawTheme === t}>{t}</option>
-              ))}
-            </select>
-          </div>
-
-          <div class="filter-field">
-            <label for="cl-diff">Difficulty</label>
-            <select id="cl-diff" name="difficulty">
-              <option value="">Any difficulty</option>
-              {allDifficulties.map(d => (
-                <option value={d} selected={rawDifficulty === d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>
+                <option value={t}>{t}</option>
               ))}
             </select>
           </div>
@@ -180,7 +127,7 @@ const categoryIcons: Record<string, string> = {
             <select id="cl-region" name="region">
               <option value="">All regions</option>
               {allRegions.map(r => (
-                <option value={r} selected={rawRegion === r}>{r}</option>
+                <option value={r}>{r}</option>
               ))}
             </select>
           </div>
@@ -188,9 +135,8 @@ const categoryIcons: Record<string, string> = {
           <div class="filter-field">
             <label for="cl-sort">Sort by</label>
             <select id="cl-sort" name="sort">
-              <option value="newest" selected={sort === 'newest'}>Newest first</option>
-              <option value="title" selected={sort === 'title'}>A–Z</option>
-              <option value="difficulty" selected={sort === 'difficulty'}>Easiest first</option>
+              <option value="newest">Newest first</option>
+              <option value="title">A–Z</option>
             </select>
           </div>
 
@@ -222,16 +168,14 @@ const categoryIcons: Record<string, string> = {
         </button>
 
         <!-- Active filters -->
-        {activeFilters.length > 0 && (
-          <div class="active-filters" aria-label="Active filters">
-            {activeFilters.map(f => <span class="chip">{f}</span>)}
-            <a href={clearHref} class="chip chip-clear">Clear all ✕</a>
-          </div>
-        )}
+        <div class="active-filters" id="cl-active-filters" aria-label="Active filters" style="display:none">
+          <span id="cl-filter-chips"></span>
+          <a href={clearHref} class="chip chip-clear" id="cl-clear-link">Clear all ✕</a>
+        </div>
 
         <!-- Results count -->
         <div class="results-bar">
-          <p><strong>{sorted.length}</strong> {sorted.length === 1 ? 'resource' : 'resources'} {activeFilters.length > 0 ? 'match your filters' : 'in the community library'}</p>
+          <p id="cl-resource-count"><strong>{sorted.length}</strong> {sorted.length === 1 ? 'resource' : 'resources'} in the community library</p>
         </div>
 
         <!-- All resources -->
@@ -239,12 +183,18 @@ const categoryIcons: Record<string, string> = {
           <section class="results-section">
             <div class="results-list">
               {sorted.map(s => (
-                <article class="result-card">
+                <article
+                  class="result-card"
+                  data-search={[s.title, s.description, ...s.dataThemes, ...s.tags, s.region].join(' ').toLowerCase()}
+                  data-themes={s.dataThemes.join('|')}
+                  data-region={s.region}
+                  data-title={s.title}
+                  data-date={new Date(s.submittedAt).getTime()}
+                >
                   <div class="result-main">
                     <div class="card-top">
                       <div class="card-category" set:html={categoryIcons[s.category] ?? ''} />
                       <span class="chip">{s.category}</span>
-                      {s.difficulty && <span class={`chip ${difficultyColor(s.difficulty)}`}>{s.difficulty}</span>}
                     </div>
                     <h3>
                       <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
@@ -291,7 +241,7 @@ const categoryIcons: Record<string, string> = {
   </section>
 
   <script>
-    // Mobile sidebar toggle
+    // ── Mobile sidebar toggle ───────────────────────────────────
     const filterBtn = document.getElementById('cl-filter-btn');
     const sidebar = document.getElementById('cl-sidebar');
     const sidebarClose = document.getElementById('cl-sidebar-close');
@@ -303,6 +253,98 @@ const categoryIcons: Record<string, string> = {
     sidebarClose?.addEventListener('click', () => {
       sidebar?.classList.remove('open');
       filterBtn?.setAttribute('aria-expanded', 'false');
+    });
+
+    // ── Client-side filtering ───────────────────────────────────
+    const form = document.getElementById('cl-filter-form') as HTMLFormElement | null;
+    const searchInput  = document.getElementById('cl-q')       as HTMLInputElement  | null;
+    const categorySelect = document.getElementById('cl-cat')   as HTMLSelectElement | null;
+    const themeSelect  = document.getElementById('cl-theme')   as HTMLSelectElement | null;
+    const regionSelect = document.getElementById('cl-region')  as HTMLSelectElement | null;
+    const sortSelect   = document.getElementById('cl-sort')    as HTMLSelectElement | null;
+    const countEl      = document.getElementById('cl-resource-count');
+    const activeFiltersEl = document.getElementById('cl-active-filters');
+    const filterChipsEl   = document.getElementById('cl-filter-chips');
+    const clearLink    = document.getElementById('cl-clear-link') as HTMLAnchorElement | null;
+    const resultsList  = document.querySelector<HTMLElement>('.results-list');
+
+    function applyFilters() {
+      const q        = searchInput?.value.trim().toLowerCase() ?? '';
+      const category = categorySelect?.value ?? '';
+      const theme    = themeSelect?.value ?? '';
+      const region   = regionSelect?.value ?? '';
+      const sort     = sortSelect?.value ?? 'newest';
+
+      const cards = Array.from(document.querySelectorAll<HTMLElement>('.result-card'));
+      let visible = 0;
+
+      cards.forEach(card => {
+        const search   = card.dataset.search ?? '';
+        const themes   = (card.dataset.themes ?? '').split('|').filter(Boolean);
+        const cardRegion = card.dataset.region ?? '';
+        // category: read from the chip text inside the card
+        const cardCategory = card.querySelector('.card-top .chip')?.textContent?.trim() ?? '';
+
+        const ok =
+          (!q        || search.includes(q)) &&
+          (!category || cardCategory === category) &&
+          (!theme    || themes.includes(theme)) &&
+          (!region   || cardRegion === region);
+
+        card.style.display = ok ? '' : 'none';
+        if (ok) visible++;
+      });
+
+      // Re-sort visible cards
+      if (resultsList) {
+        const sorted = cards
+          .filter(c => c.style.display !== 'none')
+          .sort((a, b) => {
+            if (sort === 'title') {
+              return (a.dataset.title ?? '').localeCompare(b.dataset.title ?? '');
+            }
+            return Number(b.dataset.date ?? '0') - Number(a.dataset.date ?? '0');
+          });
+        sorted.forEach(c => resultsList.appendChild(c));
+      }
+
+      // Update count
+      if (countEl) {
+        countEl.innerHTML = `<strong>${visible}</strong> ${visible === 1 ? 'resource' : 'resources'} ${visible !== cards.length ? 'match your filters' : 'in the community library'}`;
+      }
+
+      // Update active filter chips
+      const labels: string[] = [];
+      if (q)        labels.push(`Search: "${searchInput?.value.trim()}"`);
+      if (category) labels.push(`Category: ${category}`);
+      if (theme)    labels.push(`Theme: ${theme}`);
+      if (region)   labels.push(`Region: ${region}`);
+
+      if (activeFiltersEl && filterChipsEl) {
+        filterChipsEl.innerHTML = labels.map(l => `<span class="chip">${l}</span>`).join('');
+        activeFiltersEl.style.display = labels.length > 0 ? 'flex' : 'none';
+      }
+    }
+
+    // Prevent form submission — filter is client-side only
+    form?.addEventListener('submit', (e) => { e.preventDefault(); applyFilters(); });
+
+    // Live filtering on input/change
+    searchInput?.addEventListener('input', applyFilters);
+    categorySelect?.addEventListener('change', applyFilters);
+    themeSelect?.addEventListener('change', applyFilters);
+    regionSelect?.addEventListener('change', applyFilters);
+    sortSelect?.addEventListener('change', applyFilters);
+
+    // Clear all resets inputs then filters
+    clearLink?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (searchInput)   searchInput.value = '';
+      if (categorySelect) categorySelect.value = '';
+      if (themeSelect)   themeSelect.value = '';
+      if (regionSelect)  regionSelect.value = '';
+      if (sortSelect)    sortSelect.value = 'newest';
+      applyFilters();
     });
   </script>
 
