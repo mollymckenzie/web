@@ -60,8 +60,6 @@ const sorted = [...filtered].sort((a, b) => {
   return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime();
 });
 
-const featured = sorted.filter(s => s.featured);
-const rest = sorted.filter(s => !s.featured);
 
 const activeFilters = [
   rawCategory ? `Category: ${rawCategory}` : '',
@@ -236,44 +234,11 @@ const categoryIcons: Record<string, string> = {
           <p><strong>{sorted.length}</strong> {sorted.length === 1 ? 'resource' : 'resources'} {activeFilters.length > 0 ? 'match your filters' : 'in the community library'}</p>
         </div>
 
-        <!-- Featured resources -->
-        {featured.length > 0 && (
-          <section class="featured-section">
-            <h2 class="section-label">Featured</h2>
-            <div class="featured-grid">
-              {featured.map(s => (
-                <article class="featured-card">
-                  <div class="card-top">
-                    <div class="card-category" set:html={categoryIcons[s.category] ?? ''} />
-                    <span class="chip">{s.category}</span>
-                    {s.difficulty && <span class={`chip ${difficultyColor(s.difficulty)}`}>{s.difficulty}</span>}
-                  </div>
-                  <h3>
-                    <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
-                  </h3>
-                  <p>{s.description}</p>
-                  <div class="card-meta">
-                    <span class="meta-region">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/></svg>
-                      {s.region}
-                    </span>
-                    <span class="meta-submitter">by {s.submittedBy}</span>
-                  </div>
-                  <div class="chips">
-                    {s.dataThemes.slice(0, 3).map(t => <span class="chip chip-theme">{t}</span>)}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
-
         <!-- All resources -->
-        {rest.length > 0 && (
+        {sorted.length > 0 && (
           <section class="results-section">
-            {featured.length > 0 && <h2 class="section-label">All Resources</h2>}
             <div class="results-list">
-              {rest.map(s => (
+              {sorted.map(s => (
                 <article class="result-card">
                   <div class="result-main">
                     <div class="card-top">
