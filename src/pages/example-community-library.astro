@@ -1,5 +1,5 @@
 ---
-import Layout from '@layouts/Layout.astro';
+import CommunityLayout from '@layouts/CommunityLayout.astro';
 import { getCollection } from 'astro:content';
 import { canAudienceAccess } from '@lib/data/libraryAccess';
 import { withBasePath } from '@lib/paths';
@@ -32,9 +32,11 @@ function formatDate(date: Date | undefined): string {
 const submitHref = withBasePath('/submit');
 ---
 
-<Layout
+<CommunityLayout
   title="Knox County Community Data Library"
   description="A community-specific data library for Knox County, Tennessee — with role-based catalog views for teachers, students, and community members."
+  communityName="Knox County Data Library"
+  communityLocation="Knox County, Tennessee"
 >
   <div class="cdl-shell">
 
@@ -238,6 +240,7 @@ const submitHref = withBasePath('/submit');
       -webkit-appearance: none;
       font-family: var(--font-sans);
       font-size: inherit;
+      white-space: normal;
       width: 100%;
       /* Card styles */
       border: 2px solid var(--color-border);
@@ -442,4 +445,4 @@ const submitHref = withBasePath('/submit');
       color: var(--color-primary);
     }
   </style>
-</Layout>
+</CommunityLayout>
