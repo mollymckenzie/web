@@ -7,18 +7,38 @@ interface Props {
   description?: string;
   communityName: string;
   communityLocation?: string;
+  communityBase: string; // e.g. '/example-community-library'
 }
 
 const {
   title,
   communityName,
   communityLocation,
+  communityBase,
   description = `A community data library for ${communityName}.`,
 } = Astro.props;
 
 const pageTitle = title ? `${title} | ${communityName}` : communityName;
-const cdlHref = withBasePath('/');
-const submitHref = withBasePath('/submit');
+
+const base = communityBase.replace(/\/$/, '');
+const homeHref   = withBasePath(`${base}/`);
+const catalogHref = withBasePath(`${base}/catalog`);
+const mapHref     = withBasePath(`${base}/map`);
+const dataHref    = withBasePath(`${base}/data-resources`);
+const submitHref  = withBasePath('/submit');
+const cdlHref     = withBasePath('/');
+
+const currentPath = Astro.url.pathname;
+function isActive(href: string): boolean {
+  const normalized = href.replace(/\/$/, '');
+  const currentNorm = currentPath.replace(/\/$/, '');
+  if (normalized === currentNorm) return true;
+  // Home only matches exactly; other pages match prefix
+  if (href === homeHref) return false;
+  return currentPath.startsWith(normalized);
+}
+
+const initials = communityName.split(' ').slice(0, 2).map(w => w[0]).join('');
 ---
 
 <!doctype html>
@@ -41,66 +61,138 @@ const submitHref = withBasePath('/submit');
   <body>
     <div class="paper-grain" aria-hidden="true"></div>
 
-    <!-- Community-specific nav -->
-    <header class="community-nav" role="banner">
-      <div class="community-nav-inner">
-        <div class="community-brand">
-          <div class="community-mark" aria-hidden="true">
-            {communityName.split(' ').slice(0, 2).map(w => w[0]).join('')}
-          </div>
-          <div class="community-brand-text">
-            <span class="community-name">{communityName}</span>
-            {communityLocation && <span class="community-location">{communityLocation}</span>}
-          </div>
-        </div>
-        <div class="community-nav-actions">
-          <a href={submitHref} class="community-nav-submit">Suggest a Dataset</a>
-          <a href={cdlHref} class="community-nav-cdl" title="Community Data Libraries network">
-            <span class="cdl-badge">CDL</span>
-            <span class="cdl-label">Powered by CDL</span>
+    <nav class="navbar" role="navigation" aria-label="Community navigation">
+      <div class="nav-container">
+
+        <!-- Brand -->
+        <div class="nav-brand">
+          <a href={homeHref} class="brand-link">
+            <span class="brand-mark">{initials}</span>
+            <span class="brand-name">{communityName}{communityLocation && <><br/><span class="brand-location">{communityLocation}</span></>}</span>
           </a>
         </div>
+
+        <!-- Desktop links -->
+        <ul class="nav-links" id="nav-links">
+          {[
+            { href: homeHref,    label: 'Home'           },
+            { href: catalogHref, label: 'Catalog'        },
+            { href: mapHref,     label: 'Map'            },
+            { href: dataHref,    label: 'Data Resources' },
+          ].map(item => (
+            <li class="nav-item">
+              <a
+                href={item.href}
+                class={`nav-link ${isActive(item.href) ? 'active' : ''}`}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+              >{item.label}</a>
+            </li>
+          ))}
+        </ul>
+
+        <!-- Actions -->
+        <div class="nav-actions">
+          <a href={submitHref} class="nav-cta">Suggest a Dataset</a>
+          <a href={cdlHref} class="nav-cdl" title="Community Data Libraries network">
+            <span class="cdl-badge">CDL</span>
+          </a>
+          <button
+            class="mobile-menu-button"
+            aria-label="Toggle navigation menu"
+            aria-expanded="false"
+            id="mobile-menu-button"
+          >
+            <span class="hb"></span>
+            <span class="hb"></span>
+            <span class="hb"></span>
+          </button>
+        </div>
       </div>
-    </header>
+
+      <!-- Mobile drawer -->
+      <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+        <ul class="mobile-links">
+          {[
+            { href: homeHref,    label: 'Home'           },
+            { href: catalogHref, label: 'Catalog'        },
+            { href: mapHref,     label: 'Map'            },
+            { href: dataHref,    label: 'Data Resources' },
+          ].map(item => (
+            <li>
+              <a href={item.href} class={`mobile-link ${isActive(item.href) ? 'active' : ''}`}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+          <li><a href={submitHref} class="mobile-link mobile-link-cta">Suggest a Dataset →</a></li>
+          <li><a href={cdlHref} class="mobile-link mobile-link-cdl">← Back to Community Data Libraries</a></li>
+        </ul>
+      </div>
+    </nav>
 
     <main>
       <slot />
     </main>
 
-    <!-- Community-specific footer -->
-    <footer class="community-footer">
-      <div class="community-footer-inner">
-        <div class="community-footer-top">
-          <div class="community-footer-brand">
-            <div class="community-footer-mark">{communityName.split(' ').slice(0, 2).map(w => w[0]).join('')}</div>
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <div class="footer-mark">{initials}</div>
             <div>
-              <span class="community-footer-name">{communityName}</span>
-              {communityLocation && <p class="community-footer-location">{communityLocation}</p>}
+              <span class="footer-title">{communityName}</span>
+              {communityLocation && <p class="footer-tagline">{communityLocation}</p>}
             </div>
           </div>
-          <nav class="community-footer-links" aria-label="Footer navigation">
+          <nav class="footer-links" aria-label="Footer navigation">
+            <a href={homeHref}>Home</a>
+            <a href={catalogHref}>Catalog</a>
+            <a href={mapHref}>Map</a>
+            <a href={dataHref}>Data Resources</a>
             <a href={submitHref}>Suggest a Dataset</a>
             <a href={cdlHref}>Community Data Libraries ↗</a>
           </nav>
         </div>
-        <div class="community-footer-bottom">
-          <p class="community-footer-copy">
-            &copy; {new Date().getFullYear()} {communityName}. Part of the
-            <a href={cdlHref}>Community Data Libraries</a> network.
-          </p>
-          <p class="community-footer-credit">Open source under MIT · Built with Astro</p>
+        <div class="footer-bottom">
+          <p class="footer-copy">&copy; {new Date().getFullYear()} {communityName}. Part of the <a href={cdlHref}>Community Data Libraries</a> network.</p>
+          <p class="footer-tagline-bottom">Open source under MIT · Built with Astro</p>
         </div>
       </div>
     </footer>
   </body>
 </html>
 
+<script>
+  const btn = document.getElementById('mobile-menu-button');
+  const drawer = document.getElementById('mobile-drawer');
+  btn?.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    btn.classList.toggle('open', !open);
+    drawer?.classList.toggle('open', !open);
+    drawer?.setAttribute('aria-hidden', String(open));
+  });
+  document.addEventListener('click', (e) => {
+    if (!(e.target instanceof Element)) return;
+    if (!e.target.closest('.navbar')) {
+      btn?.setAttribute('aria-expanded', 'false');
+      btn?.classList.remove('open');
+      drawer?.classList.remove('open');
+      drawer?.setAttribute('aria-hidden', 'true');
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      btn?.setAttribute('aria-expanded', 'false');
+      btn?.classList.remove('open');
+      drawer?.classList.remove('open');
+      drawer?.setAttribute('aria-hidden', 'true');
+    }
+  });
+</script>
+
 <style is:global>
-  *, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --color-background: #F5F8FA;
@@ -143,80 +235,50 @@ const submitHref = withBasePath('/submit');
     --line-height-normal: 1.6;
     --line-height-relaxed: 1.8;
 
-    --space-1: 0.25rem;
-    --space-2: 0.5rem;
-    --space-3: 0.75rem;
-    --space-4: 1rem;
-    --space-5: 1.25rem;
-    --space-6: 1.5rem;
-    --space-8: 2rem;
-    --space-12: 3rem;
-    --space-16: 4rem;
-    --space-24: 6rem;
+    --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+    --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-12: 3rem;
+    --space-16: 4rem; --space-24: 6rem;
 
-    --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.10);
-    --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.14);
-    --shadow-lg: 0 12px 40px -8px rgba(15, 23, 42, 0.18);
-    --shadow-glow-primary: 0 4px 20px -4px rgba(14, 114, 101, 0.28);
-    --shadow-glow-secondary: 0 4px 20px -4px rgba(21, 94, 117, 0.28);
-    --shadow-glow-accent: 0 4px 20px -4px rgba(26, 107, 69, 0.28);
+    --shadow-sm: 0 1px 3px 0 rgba(15,23,42,0.10);
+    --shadow-md: 0 4px 16px -2px rgba(15,23,42,0.14);
+    --shadow-lg: 0 12px 40px -8px rgba(15,23,42,0.18);
+    --shadow-glow-primary: 0 4px 20px -4px rgba(14,114,101,0.28);
+    --shadow-glow-secondary: 0 4px 20px -4px rgba(21,94,117,0.28);
+    --shadow-glow-accent: 0 4px 20px -4px rgba(26,107,69,0.28);
 
-    --radius-sm: 0.2rem;
-    --radius-md: 0.45rem;
-    --radius-lg: 0.875rem;
-    --radius-xl: 1.5rem;
+    --radius-sm: 0.2rem; --radius-md: 0.45rem; --radius-lg: 0.875rem; --radius-xl: 1.5rem;
   }
 
   .paper-grain {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.028;
+    position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.028;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 128px 128px;
+    background-repeat: repeat; background-size: 128px 128px;
   }
 
   html {
-    font-family: var(--font-sans);
-    font-size: 16px;
-    line-height: var(--line-height-normal);
-    color: var(--color-text);
-    background-color: var(--color-background);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    scroll-behavior: smooth;
+    font-family: var(--font-sans); font-size: 16px; line-height: var(--line-height-normal);
+    color: var(--color-text); background-color: var(--color-background);
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth;
   }
 
   body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    min-height: 100vh; display: flex; flex-direction: column;
     background-color: var(--color-background);
     background-image:
-      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(14, 114, 101, 0.05) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 100% 20%, rgba(21, 94, 117, 0.04) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 50% at 0% 80%, rgba(26, 107, 69, 0.03) 0%, transparent 60%);
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(14,114,101,0.05) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 100% 20%, rgba(21,94,117,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 0% 80%, rgba(26,107,69,0.03) 0%, transparent 60%);
   }
 
   main {
-    flex: 1;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+    flex: 1; width: 100%; max-width: 1200px; margin: 0 auto;
     padding: var(--space-8) var(--space-6);
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    font-weight: 700;
-    line-height: var(--line-height-tight);
-    margin-bottom: var(--space-4);
-    letter-spacing: -0.02em;
-    color: var(--color-text);
+  h1,h2,h3,h4,h5,h6 {
+    font-family: var(--font-display); font-weight: 700; line-height: var(--line-height-tight);
+    margin-bottom: var(--space-4); letter-spacing: -0.02em; color: var(--color-text);
   }
-
   h1 { font-size: var(--font-size-4xl); font-weight: 900; }
   h2 { font-size: var(--font-size-3xl); }
   h3 { font-size: var(--font-size-2xl); }
@@ -224,31 +286,15 @@ const submitHref = withBasePath('/submit');
 
   p { margin-bottom: var(--space-4); }
 
-  a {
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color 0.18s ease;
-  }
+  a { color: var(--color-primary); text-decoration: none; transition: color 0.18s ease; }
+  a:hover { color: var(--color-primary-dark); text-decoration: underline; text-underline-offset: 3px; }
 
-  a:hover {
-    color: var(--color-primary-dark);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  ul, ol {
-    margin-left: var(--space-6);
-    margin-bottom: var(--space-4);
-  }
+  ul, ol { margin-left: var(--space-6); margin-bottom: var(--space-4); }
 
   code {
-    font-family: var(--font-mono);
-    font-size: var(--font-size-sm);
-    background-color: var(--color-surface-raised);
-    color: var(--color-primary);
-    padding: 0.12em var(--space-2);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-border);
+    font-family: var(--font-mono); font-size: var(--font-size-sm);
+    background-color: var(--color-surface-raised); color: var(--color-primary);
+    padding: 0.12em var(--space-2); border-radius: var(--radius-sm); border: 1px solid var(--color-border);
   }
 
   @media (max-width: 768px) {
@@ -258,318 +304,158 @@ const submitHref = withBasePath('/submit');
   }
 
   button, .button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-6);
-    background-color: var(--color-primary);
-    color: #F8FAFC;
-    border: 1.5px solid var(--color-primary);
-    border-radius: var(--radius-md);
-    font-family: var(--font-sans);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    transition: all 0.18s ease;
-    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    padding: var(--space-3) var(--space-6); background-color: var(--color-primary); color: #F8FAFC;
+    border: 1.5px solid var(--color-primary); border-radius: var(--radius-md);
+    font-family: var(--font-sans); font-size: var(--font-size-sm); font-weight: 600;
+    letter-spacing: 0.02em; cursor: pointer; transition: all 0.18s ease; text-decoration: none;
     white-space: nowrap;
   }
-
   button:hover, .button:hover {
-    background-color: var(--color-primary-dark);
-    border-color: var(--color-primary-dark);
-    box-shadow: var(--shadow-glow-primary);
-    transform: translateY(-1px);
-    text-decoration: none;
-    color: #F8FAFC;
+    background-color: var(--color-primary-dark); border-color: var(--color-primary-dark);
+    box-shadow: var(--shadow-glow-primary); transform: translateY(-1px); text-decoration: none; color: #F8FAFC;
   }
 
-  :focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-</style>
-
-<style>
-  /* ── Community nav ──────────────────────────── */
-  .community-nav {
-    background: rgba(245, 248, 250, 0.94);
-    border-bottom: 1px solid var(--color-border);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-  }
-
-  .community-nav-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--space-6);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--space-4);
-    height: 64px;
-  }
-
-  .community-brand {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    flex-shrink: 0;
-    min-width: 0;
-  }
-
-  .community-mark {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-size: 1rem;
-    letter-spacing: -0.04em;
-    color: #F8FAFC;
-    background: var(--color-secondary);
-    padding: 0.2em 0.5em 0.18em;
-    border-radius: var(--radius-sm);
-    line-height: 1;
-    flex-shrink: 0;
-  }
-
-  .community-brand-text {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-
-  .community-name {
-    font-family: var(--font-display);
-    font-size: var(--font-size-base);
-    font-weight: 700;
-    color: var(--color-text);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .community-location {
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    color: var(--color-text-dim);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    line-height: 1;
-  }
-
-  .community-nav-actions {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    flex-shrink: 0;
-  }
-
-  .community-nav-submit {
-    display: none;
-    padding: var(--space-2) var(--space-4);
-    background: var(--color-secondary);
-    color: #F8FAFC;
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.18s ease;
-    white-space: nowrap;
-    border: 1.5px solid var(--color-secondary);
-  }
-
-  .community-nav-submit:hover {
-    background: var(--color-secondary-light);
-    border-color: var(--color-secondary-light);
-    box-shadow: var(--shadow-glow-secondary);
-    transform: translateY(-1px);
-    text-decoration: none;
-    color: #F8FAFC;
-  }
-
-  @media (min-width: 540px) {
-    .community-nav-submit { display: inline-flex; align-items: center; }
-  }
-
-  .community-nav-cdl {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    text-decoration: none;
-    padding: var(--space-1) var(--space-2);
-    border-radius: var(--radius-md);
-    transition: background 0.15s ease;
-  }
-
-  .community-nav-cdl:hover {
-    background: var(--color-primary-glow);
-    text-decoration: none;
-  }
-
-  .cdl-badge {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-size: 0.65rem;
-    letter-spacing: -0.04em;
-    color: var(--color-primary);
-    background: var(--color-primary-glow);
-    border: 1px solid rgba(14, 114, 101, 0.25);
-    padding: 0.15em 0.4em 0.1em;
-    border-radius: var(--radius-sm);
-    line-height: 1;
-    flex-shrink: 0;
-  }
-
-  .cdl-label {
-    display: none;
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    color: var(--color-text-muted);
-    white-space: nowrap;
-  }
-
-  @media (min-width: 768px) {
-    .cdl-label { display: block; }
-  }
-
-  /* ── Community footer ───────────────────────── */
-  .community-footer {
-    background-color: var(--color-text);
-    color: #D6C9B8;
+  footer {
+    background-color: var(--color-text); color: #D6C9B8;
     padding: var(--space-12) var(--space-6) var(--space-8);
-    margin-top: var(--space-16);
-    position: relative;
-    overflow: hidden;
+    margin-top: var(--space-16); position: relative; overflow: hidden;
   }
-
-  .community-footer::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
+  footer::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 50%, var(--color-accent-light) 100%);
   }
 
-  .community-footer-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
+  .footer-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+  .footer-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: var(--space-8); flex-wrap: wrap; padding-bottom: var(--space-8);
+    border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: var(--space-6);
+  }
+  .footer-brand { display: flex; align-items: flex-start; gap: var(--space-4); }
+  .footer-mark {
+    font-family: var(--font-display); font-size: var(--font-size-xl); font-weight: 900;
+    color: var(--color-secondary-light); letter-spacing: -0.04em; line-height: 1;
+    padding: var(--space-2) var(--space-3); border: 1.5px solid rgba(21,94,117,0.4);
+    border-radius: var(--radius-sm); flex-shrink: 0; margin-top: 2px;
+  }
+  .footer-title {
+    display: block; font-family: var(--font-display); font-weight: 700;
+    font-size: var(--font-size-lg); color: #E2E8F0; letter-spacing: -0.02em; margin-bottom: var(--space-1);
+  }
+  .footer-tagline { margin: 0; font-size: var(--font-size-sm); color: #8A7A6A; line-height: var(--line-height-relaxed); max-width: 30ch; }
+  .footer-links { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); align-items: center; }
+  .footer-links a { font-size: var(--font-size-sm); color: #8A7A6A; text-decoration: none; transition: color 0.15s ease; font-weight: 500; }
+  .footer-links a:hover { color: var(--color-secondary-light); text-decoration: none; }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+  .footer-copy { font-size: var(--font-size-xs); color: #5A4A3A; margin: 0; font-family: var(--font-mono); }
+  .footer-copy a { color: var(--color-secondary-light); text-decoration: none; }
+  .footer-copy a:hover { text-decoration: underline; }
+  .footer-tagline-bottom { font-size: var(--font-size-xs); color: #5A4A3A; margin: 0; font-family: var(--font-mono); }
+
+  :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+</style>
+
+<style>
+  /* ── Navbar ──────────────────────────────────── */
+  .navbar {
+    background: rgba(245,248,250,0.92); border-bottom: 1px solid var(--color-border);
+    position: sticky; top: 0; z-index: 1000;
+    backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
+  }
+  .nav-container {
+    max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6);
+    display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); height: 64px;
   }
 
-  .community-footer-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--space-8);
-    flex-wrap: wrap;
-    padding-bottom: var(--space-8);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    margin-bottom: var(--space-6);
+  /* Brand */
+  .nav-brand { flex-shrink: 0; }
+  .brand-link { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; transition: opacity 0.15s ease; }
+  .brand-link:hover { opacity: 0.8; text-decoration: none; }
+  .brand-mark {
+    font-family: var(--font-display); font-weight: 900; font-size: 1.1rem; letter-spacing: -0.04em;
+    color: #F8FAFC; background: var(--color-secondary); padding: 0.2em 0.45em 0.18em;
+    border-radius: var(--radius-sm); line-height: 1; flex-shrink: 0;
+  }
+  .brand-name {
+    font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; color: var(--color-text);
+    letter-spacing: -0.01em; line-height: 1.25;
+  }
+  .brand-location {
+    font-size: 0.62rem; font-weight: 500; color: var(--color-text-dim);
+    letter-spacing: 0.04em; text-transform: uppercase;
   }
 
-  .community-footer-brand {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-4);
+  /* Desktop links */
+  .nav-links { display: none; list-style: none; gap: var(--space-1); margin: 0; padding: 0; }
+  @media (min-width: 768px) { .nav-links { display: flex; } }
+  .nav-item { margin: 0; }
+  .nav-link {
+    display: block; padding: var(--space-2) var(--space-3); font-family: var(--font-sans);
+    font-size: var(--font-size-sm); font-weight: 500; color: var(--color-text-muted);
+    border-radius: var(--radius-md); text-decoration: none; transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap; position: relative;
+  }
+  .nav-link:hover { background: var(--color-secondary-glow); color: var(--color-secondary); text-decoration: none; }
+  .nav-link.active { color: var(--color-secondary); font-weight: 600; background: var(--color-secondary-glow); }
+  .nav-link.active::after {
+    content: ''; position: absolute; bottom: 0; left: var(--space-3); right: var(--space-3);
+    height: 2px; background: var(--color-secondary); border-radius: 1px;
   }
 
-  .community-footer-mark {
-    font-family: var(--font-display);
-    font-size: var(--font-size-xl);
-    font-weight: 900;
-    color: var(--color-secondary-light);
-    letter-spacing: -0.04em;
-    line-height: 1;
-    padding: var(--space-2) var(--space-3);
-    border: 1.5px solid rgba(21, 94, 117, 0.4);
-    border-radius: var(--radius-sm);
-    flex-shrink: 0;
-    margin-top: 2px;
+  /* Nav actions */
+  .nav-actions { display: flex; align-items: center; gap: var(--space-3); flex-shrink: 0; }
+  .nav-cta {
+    display: none; padding: var(--space-2) var(--space-4); background: var(--color-secondary);
+    color: #F8FAFC; border-radius: var(--radius-md); font-size: var(--font-size-sm); font-weight: 600;
+    text-decoration: none; transition: all 0.18s ease; white-space: nowrap; border: 1.5px solid var(--color-secondary);
+  }
+  .nav-cta:hover {
+    background: var(--color-secondary-light); border-color: var(--color-secondary-light);
+    box-shadow: var(--shadow-glow-secondary); transform: translateY(-1px); text-decoration: none; color: #F8FAFC;
+  }
+  @media (min-width: 640px) { .nav-cta { display: inline-flex; align-items: center; } }
+
+  .nav-cdl {
+    display: flex; align-items: center; text-decoration: none;
+    padding: var(--space-1) var(--space-2); border-radius: var(--radius-md); transition: background 0.15s ease;
+  }
+  .nav-cdl:hover { background: var(--color-primary-glow); text-decoration: none; }
+  .cdl-badge {
+    font-family: var(--font-display); font-weight: 900; font-size: 0.65rem; letter-spacing: -0.04em;
+    color: var(--color-primary); background: var(--color-primary-glow); border: 1px solid rgba(14,114,101,0.25);
+    padding: 0.15em 0.4em 0.1em; border-radius: var(--radius-sm); line-height: 1;
   }
 
-  .community-footer-name {
-    display: block;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: var(--font-size-lg);
-    color: #E2E8F0;
-    letter-spacing: -0.02em;
-    margin-bottom: var(--space-1);
+  /* Hamburger */
+  .mobile-menu-button {
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    gap: 5px; width: 38px; height: 38px; background: transparent; border: 1.5px solid var(--color-border);
+    cursor: pointer; border-radius: var(--radius-md); transition: border-color 0.15s ease, background 0.15s ease;
+    padding: 0; flex-shrink: 0;
   }
+  .mobile-menu-button:hover { background: var(--color-secondary-glow); border-color: var(--color-secondary); box-shadow: none; transform: none; }
+  .hb { display: block; width: 18px; height: 1.5px; background: var(--color-text-muted); border-radius: 2px; transition: all 0.22s ease; transform-origin: center; }
+  .mobile-menu-button.open .hb:nth-child(1) { transform: translateY(6.5px) rotate(45deg); background: var(--color-secondary); }
+  .mobile-menu-button.open .hb:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .mobile-menu-button.open .hb:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); background: var(--color-secondary); }
+  @media (min-width: 768px) { .mobile-menu-button { display: none; } }
 
-  .community-footer-location {
-    margin: 0;
-    font-size: var(--font-size-sm);
-    color: #8A7A6A;
-    line-height: var(--line-height-relaxed);
+  /* Mobile drawer */
+  .mobile-drawer { display: none; background: var(--color-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); padding: var(--space-4) var(--space-6); box-shadow: var(--shadow-md); }
+  .mobile-drawer.open { display: block; }
+  @media (min-width: 768px) { .mobile-drawer { display: none !important; } }
+  .mobile-links { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
+  .mobile-link {
+    display: block; padding: var(--space-3) var(--space-4); font-size: var(--font-size-base); font-weight: 500;
+    color: var(--color-text-muted); border-radius: var(--radius-md); text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
   }
-
-  .community-footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-6);
-    align-items: center;
-  }
-
-  .community-footer-links a {
-    font-size: var(--font-size-sm);
-    color: #8A7A6A;
-    text-decoration: none;
-    transition: color 0.15s ease;
-    font-weight: 500;
-  }
-
-  .community-footer-links a:hover {
-    color: var(--color-secondary-light);
-    text-decoration: none;
-  }
-
-  .community-footer-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--space-4);
-    flex-wrap: wrap;
-  }
-
-  .community-footer-copy {
-    font-size: var(--font-size-xs);
-    color: #5A4A3A;
-    margin: 0;
-    font-family: var(--font-mono);
-  }
-
-  .community-footer-copy a {
-    color: var(--color-secondary-light);
-    text-decoration: none;
-  }
-
-  .community-footer-copy a:hover {
-    text-decoration: underline;
-  }
-
-  .community-footer-credit {
-    font-size: var(--font-size-xs);
-    color: #5A4A3A;
-    margin: 0;
-    font-family: var(--font-mono);
-  }
+  .mobile-link:hover { background: var(--color-secondary-glow); color: var(--color-secondary); text-decoration: none; }
+  .mobile-link.active { color: var(--color-secondary); font-weight: 600; background: var(--color-secondary-glow); }
+  .mobile-link-cta { color: var(--color-secondary); font-weight: 700; border: 1.5px solid var(--color-border); text-align: center; margin-top: var(--space-2); }
+  .mobile-link-cta:hover { background: var(--color-secondary); color: #F8FAFC; border-color: var(--color-secondary); }
+  .mobile-link-cdl { font-size: var(--font-size-sm); color: var(--color-text-dim); border-top: 1px solid var(--color-border); margin-top: var(--space-2); padding-top: var(--space-4); }
 </style>
