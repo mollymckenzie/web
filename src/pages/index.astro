@@ -1,333 +1,917 @@
 ---
 import Layout from '@layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import submissions from '@data/community-submissions.json';
+import { withBasePath } from '@lib/paths';
+
+const catalogResources = await getCollection('master-library');
+const datasetCount = catalogResources.filter((entry) => entry.data.category === 'dataset').length;
+const communityResourceCount = submissions.length;
+const regionCount = new Set(submissions.map((entry) => entry.region)).size;
 ---
 
 <Layout
   title="Home"
   description="Discover curated data science resources and contribute to our growing community library of datasets, tools, guides, and research papers."
 >
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-inner">
+  <!-- ═══════════════════════════════════════════
+       HERO — Split layout: text left, visual right
+  ═══════════════════════════════════════════ -->
+  <section class="hero" aria-label="Introduction">
+    <div class="hero-text">
+      <div class="hero-kicker">
+        Open-Source · Community-Focused · Free Forever
+      </div>
+
       <h1 class="hero-title">
-        <span class="gradient-text">Community Data Libraries</span>
+        Data <em class="word-about">about</em> the community,<br/>
+        <em class="word-for">for</em> the community.
       </h1>
-      <p class="hero-description">
-        Curated datasets, tools, guides, and research papers — for researchers,
-        students, and communities.
+
+      <p class="hero-body">
+        A curated catalog of datasets and resources —
+        filtered to focus on your geographic community.
       </p>
+
       <div class="hero-actions">
-        <a href="/web/master-library" class="button">Explore the Library</a>
-        <a href="/web/maps" class="button button-ghost">View Map</a>
+        <a href={withBasePath('/complete-catalog')} class="btn-primary">
+          Explore the Complete Catalog
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a href={withBasePath('/maps')} class="btn-ghost">View Map</a>
+      </div>
+
+      <!-- <div class="hero-roles" aria-label="Browse by role">
+        <span class="roles-label">Browse as</span>
+        <a href={withBasePath('/teacher')} class="role-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          Teacher
+        </a>
+        <a href={withBasePath('/student')} class="role-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Student
+        </a>
+        <a href={withBasePath('/community-member')} class="role-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Community
+        </a>
+      </div> -->
+    </div>
+
+    <!-- Hero visual — abstract data grid -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="viz-card">
+        <div class="viz-header">
+          <span class="viz-dot r"></span>
+          <span class="viz-dot y"></span>
+          <span class="viz-dot g"></span>
+          <span class="viz-label">census-acs-demographics.csv</span>
+        </div>
+        <div class="viz-table">
+          <div class="vt-head">
+            <span>county_fips</span><span>population</span><span>median_income</span><span>category</span>
+          </div>
+          {[
+            ['17031', '5,275,541', '$62,088', 'Cook, IL'],
+            ['06037', '9,829,544', '$71,358', 'Los Angeles, CA'],
+            ['48201', '4,728,030', '$60,154', 'Harris, TX'],
+            ['04013', '4,420,568', '$66,422', 'Maricopa, AZ'],
+            ['06073', '3,338,330', '$79,506', 'San Diego, CA'],
+            ['06059', '3,175,692', '$83,044', 'Orange, CA'],
+          ].map(([fips, pop, income, name]) => (
+            <div class="vt-row">
+              <span class="mono">{fips}</span>
+              <span class="mono">{pop}</span>
+              <span class="mono">{income}</span>
+              <span>{name}</span>
+            </div>
+          ))}
+        </div>
+        <div class="viz-footer">
+          <span class="viz-tag">dataset</span>
+          <span class="viz-tag">beginner</span>
+          <span class="viz-tag">demographics</span>
+          <span class="viz-more">+3,142 rows</span>
+        </div>
+      </div>
+
+      <!-- Floating stat badges -->
+      <div class="badge badge-1">
+        <strong>{datasetCount}</strong>
+        <span>Curated datasets</span>
+      </div>
+      <div class="badge badge-2">
+        <strong>{communityResourceCount}</strong>
+        <span>Community resources</span>
       </div>
     </div>
   </section>
 
-  <!-- Audience quick-links -->
-  <section class="audience-bar" aria-label="Browse by role">
-    <span class="audience-label">Browse as:</span>
-    <div class="audience-pills">
-      <a href="/web/teacher" class="pill">Teacher</a>
-      <a href="/web/student" class="pill">Student</a>
-      <a href="/web/community-member" class="pill">Community Member</a>
+  <!-- ═══════════════════════════════════════════
+       STATS STRIP
+  ═══════════════════════════════════════════ -->
+  <div class="stats-strip" aria-label="Platform statistics">
+    <div class="stat-item">
+      <span class="stat-n">{datasetCount}</span>
+      <span class="stat-l">Datasets</span>
+    </div>
+    <div class="stat-sep" aria-hidden="true">·</div>
+    <div class="stat-item">
+      <span class="stat-n">{communityResourceCount}</span>
+      <span class="stat-l">Community Resources</span>
+    </div>
+    <div class="stat-sep" aria-hidden="true">·</div>
+    <div class="stat-item">
+      <span class="stat-n">{regionCount}</span>
+      <span class="stat-l">Regions</span>
+    </div>
+    <div class="stat-sep" aria-hidden="true">·</div>
+    <div class="stat-item">
+      <span class="stat-n">10+</span>
+      <span class="stat-l">Community Libraries</span>
+    </div>
+    <div class="stat-sep" aria-hidden="true">·</div>
+    <div class="stat-item">
+      <span class="stat-n">100%</span>
+      <span class="stat-l">Open Source</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       HOW IT WORKS  — editorial 3-column
+  ═══════════════════════════════════════════ -->
+  <section class="how-section" aria-label="How it works">
+    <header class="section-header">
+      <p class="section-eyebrow">How it works</p>
+      <h2 class="section-title">Built for classrooms.<br/><span class="section-title-accent">Designed for communities.</span></h2>
+    </header>
+
+    <p class="how-section">
+        Follow the setup steps to <a href={withBasePath('/data-preview')}>create a library</a> for your community. No technical expertise is needed. Your community library will be created, continuously updated, and available automatically.
+    </p>
+
+    <div class="how-grid">
+      <div class="how-step">
+        <h3>Curated catalog</h3>
+        <p>Editors review and tag every resource — geographic coverage, dataset topic, and statistical properties for classroom use.</p>
+      </div>
+      <div class="how-step">
+        <h3>Local geographic filtering</h3>
+        <p>We handle the complexity of geographies. You will specify the geography of your community when creating your library, and we will automatically create your local dataset catalog.</p>
+      </div>
+      <div class="how-step">
+        <h3>Community accessibility</h3>
+        <p>Everyone can suggest new data resources. Suggestions are reviewed and rolled out in regular library updates so community libraries stay up-to-date.</p>
+      </div>
     </div>
   </section>
 
-  <!-- Feature cards -->
-  <section class="features" aria-label="Key sections">
+  <!-- ═══════════════════════════════════════════
+       FEATURE CARDS — 3-up
+  ═══════════════════════════════════════════ -->
+  <!-- <section class="features-section" aria-label="Key sections">
     <div class="feature-grid">
-      <article class="feature-card">
-        <div class="feature-icon-wrap">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+
+      <article class="feature-card fc-1">
+        <div class="fc-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         </div>
-        <h2>Master Library</h2>
-        <p>
-          Expert-curated datasets, tools, guides, and research papers, organized by theme and audience.
-        </p>
-        <a href="/web/master-library" class="feature-link">Explore resources &rarr;</a>
+        <div class="fc-index">01</div>
+        <h2 class="fc-title">Complete Catalog</h2>
+        <h2 class="fc-title">Master Library</h2>
+        <p class="fc-body">Expert-curated datasets, tools, guides, and research papers — organized by theme, difficulty, and audience role.</p>
+        <a href={withBasePath('/complete-catalog')} class="fc-link">
+          Explore the catalog
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
       </article>
 
-      <article class="feature-card">
-        <div class="feature-icon-wrap">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <article class="feature-card fc-2">
+        <div class="fc-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <h2>Community Library</h2>
-        <p>
-          Resources contributed by practitioners from around the world. Unique datasets and local knowledge.
-        </p>
-        <a href="/web/community-library" class="feature-link">Browse community &rarr;</a>
+        <h2 class="fc-title">Community Library</h2>
+        <p class="fc-body">Resources discovered and shared by practitioners, researchers, and teachers from around the world.</p>
+        <a href={withBasePath('/community-library')} class="fc-link">
+          Browse community
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
       </article>
 
-      <article class="feature-card">
-        <div class="feature-icon-wrap">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <article class="feature-card fc-3">
+        <div class="fc-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/></svg>
         </div>
-        <h2>Contribute</h2>
-        <p>
-          Share datasets, tools, or guides with the community. Help others discover valuable resources.
-        </p>
-        <a href="/web/submit" class="feature-link">Submit a resource &rarr;</a>
+        <h2 class="fc-title">Interactive Map</h2>
+        <p class="fc-body">Explore open data portals, community organizations, and events on a global map with category filters.</p>
+        <a href={withBasePath('/maps')} class="fc-link">
+          Open map
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
       </article>
+
+    </div>
+  </section> -->
+
+  <!-- ═══════════════════════════════════════════
+       CONTRIBUTE CTA BANNER
+  ═══════════════════════════════════════════ -->
+  <section class="cta-banner" aria-label="Contribute">
+    <div class="cta-text">
+      <p class="cta-eyebrow">Community-Driven Catalogs</p>
+      <h2 class="cta-title">Know an open dataset containing community data?</h2>
+      <p class="cta-body">Help expand the dataset catalog by sharing datasets openly available on the web. All submissions are reviewed before publication.</p>
+    </div>
+    <div class="cta-actions">
+      <a href={withBasePath('/submit')} class="btn-primary btn-large">Submit a Resource →</a>
+      <a href="https://github.com/community-data-libraries/web" target="_blank" rel="noopener noreferrer" class="cta-github">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        View on GitHub
+      </a>
     </div>
   </section>
 
-  <!-- Stats -->
-  <section class="stats-section" aria-label="Platform statistics">
-    <div class="stats-grid">
-      <div class="stat-item">
-        <span class="stat-number">500+</span>
-        <span class="stat-label">Curated Resources</span>
-      </div>
-      <div class="stat-divider" aria-hidden="true"></div>
-      <div class="stat-item">
-        <span class="stat-number">1,000+</span>
-        <span class="stat-label">Community Submissions</span>
-      </div>
-      <div class="stat-divider" aria-hidden="true"></div>
-      <div class="stat-item">
-        <span class="stat-number">10k+</span>
-        <span class="stat-label">Active Users</span>
-      </div>
-      <div class="stat-divider" aria-hidden="true"></div>
-      <div class="stat-item">
-        <span class="stat-number">100%</span>
-        <span class="stat-label">Open Source</span>
-      </div>
-    </div>
-  </section>
 </Layout>
 
 <style>
-  /* Hero */
+  /* ══════════════════════════════════════════════
+     HERO
+  ══════════════════════════════════════════════ */
   .hero {
-    padding: var(--space-16) var(--space-4) var(--space-12);
-    text-align: center;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+    padding: var(--space-12) 0 var(--space-16);
+    align-items: center;
   }
 
-  .hero-inner {
-    max-width: 680px;
-    margin: 0 auto;
+  @media (min-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+      min-height: 560px;
+    }
+  }
+
+  /* Text side */
+  .hero-text {
+    display: grid;
+    gap: var(--space-6);
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--color-primary);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .kicker-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%  { opacity: 0.5; transform: scale(0.75); }
   }
 
   .hero-title {
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.03em;
-    margin-bottom: var(--space-6);
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+    color: var(--color-text);
+    margin: 0;
   }
 
-  .gradient-text {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .hero-title em {
+    font-style: italic;
   }
 
-  .hero-description {
-    font-size: var(--font-size-xl);
+  .word-about {
+    color: var(--color-primary);
+  }
+
+  .word-for {
+    color: var(--color-secondary);
+  }
+
+  .hero-body {
+    font-size: var(--font-size-lg);
     color: var(--color-text-muted);
     line-height: var(--line-height-relaxed);
-    margin-bottom: var(--space-8);
+    margin: 0;
+    max-width: 44ch;
   }
 
   .hero-actions {
     display: flex;
     gap: var(--space-3);
-    justify-content: center;
     flex-wrap: wrap;
-  }
-
-  .button-ghost {
-    background-color: transparent;
-    color: var(--color-primary);
-    border: 1.5px solid var(--color-primary);
-  }
-
-  .button-ghost:hover {
-    background-color: var(--color-primary);
-    color: white;
-  }
-
-  /* Audience bar */
-  .audience-bar {
-    display: flex;
     align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-4) var(--space-5);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-12);
-    flex-wrap: wrap;
   }
 
-  .audience-label {
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: var(--color-primary);
+    color: #F8FAFC;
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
     font-weight: 600;
-    color: var(--color-text-muted);
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    cursor: pointer;
     white-space: nowrap;
   }
 
-  .audience-pills {
+  .btn-primary:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    box-shadow: var(--shadow-glow-primary);
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: #F8FAFC;
+  }
+
+  .btn-primary svg { transition: transform 0.18s ease; }
+  .btn-primary:hover svg { transform: translateX(3px); }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-3) var(--space-5);
+    background: transparent;
+    color: var(--color-text-muted);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-primary-glow);
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  /* Role pills */
+  .hero-roles {
     display: flex;
+    align-items: center;
     gap: var(--space-2);
     flex-wrap: wrap;
   }
 
-  .pill {
+  .roles-label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: var(--space-1);
+  }
+
+  .role-pill {
     display: inline-flex;
     align-items: center;
-    padding: var(--space-1) var(--space-4);
-    border: 1px solid var(--color-border);
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
     border-radius: 999px;
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--color-text);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-muted);
     text-decoration: none;
     transition: all 0.15s ease;
-    background: var(--color-background);
   }
 
-  .pill:hover {
+  .role-pill:hover {
     border-color: var(--color-primary);
     color: var(--color-primary);
-    background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+    background: var(--color-primary-glow);
     text-decoration: none;
   }
 
-  /* Feature grid */
-  .features {
-    margin-bottom: var(--space-12);
+  /* ── Visual side ──────────────────────────── */
+  .hero-visual {
+    position: relative;
+    animation: fadeUp 0.7s 0.15s ease both;
   }
 
-  .feature-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-5);
-  }
-
-  @media (min-width: 640px) {
-    .feature-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .feature-card {
+  .viz-card {
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    display: grid;
-    gap: var(--space-3);
-    align-content: start;
-    transition:
-      box-shadow 0.2s ease,
-      border-color 0.2s ease;
-  }
-
-  .feature-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border));
-  }
-
-  .feature-icon-wrap {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
-    border-radius: var(--radius-md);
-    color: var(--color-primary);
-  }
-
-  .feature-card h2 {
-    font-size: var(--font-size-xl);
-    font-weight: 700;
-    margin: 0;
-    letter-spacing: -0.01em;
-  }
-
-  .feature-card p {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-muted);
-    line-height: var(--line-height-relaxed);
-    margin: 0;
-  }
-
-  .feature-link {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--color-primary);
-    text-decoration: none;
-    margin-top: var(--space-2);
-  }
-
-  .feature-link:hover {
-    color: var(--color-primary-dark);
-    text-decoration: underline;
-  }
-
-  /* Stats */
-  .stats-section {
-    margin-bottom: var(--space-8);
-  }
-
-  .stats-grid {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    border: 1.5px solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .viz-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-raised);
+    border-bottom: 1.5px solid var(--color-border);
+  }
+
+  .viz-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .viz-dot.r { background: #E57373; }
+  .viz-dot.y { background: #FFB74D; }
+  .viz-dot.g { background: #81C784; }
+
+  .viz-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--color-text-dim);
+    margin-left: var(--space-2);
+  }
+
+  .viz-table { padding: 0; }
+
+  .vt-head {
+    display: grid;
+    grid-template-columns: 80px 100px 120px 1fr;
+    gap: 0;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-surface-raised);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-primary);
+    font-weight: 500;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .vt-row {
+    display: grid;
+    grid-template-columns: 80px 100px 120px 1fr;
+    gap: 0;
+    padding: var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.68rem;
+    transition: background 0.12s ease;
+  }
+
+  .vt-row:last-child { border-bottom: none; }
+  .vt-row:hover { background: var(--color-primary-glow); }
+
+  .vt-row .mono { color: var(--color-text); }
+
+  .viz-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-raised);
+    border-top: 1.5px solid var(--color-border);
+    flex-wrap: wrap;
+  }
+
+  .viz-tag {
+    padding: 2px 8px;
+    background: var(--color-primary-glow);
+    border: 1px solid rgba(15, 118, 110, 0.2);
+    border-radius: var(--radius-sm);
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .viz-more {
+    margin-left: auto;
+    font-size: 0.65rem;
+    color: var(--color-text-dim);
+  }
+
+  /* Floating badges */
+  .badge {
+    position: absolute;
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  .badge strong {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--color-primary);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .badge span {
+    font-size: 0.65rem;
+    color: var(--color-text-dim);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .badge-1 {
+    bottom: -24px;
+    left: -20px;
+    animation-delay: 0s;
+  }
+
+  .badge-2 {
+    top: -20px;
+    right: -16px;
+    animation-delay: 1.5s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  @media (max-width: 899px) {
+    .badge { display: none; }
+  }
+
+  /* ══════════════════════════════════════════════
+     STATS STRIP
+  ══════════════════════════════════════════════ */
+  .stats-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    padding: var(--space-6) var(--space-8);
+    background: var(--color-text);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-16);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Decorative stripe */
+  .stats-strip::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent-light), var(--color-secondary-light));
   }
 
   .stat-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: var(--space-6) var(--space-8);
-    flex: 1;
-    min-width: 120px;
-    gap: var(--space-1);
+    gap: 4px;
   }
 
-  .stat-divider {
-    width: 1px;
-    height: 40px;
-    background: var(--color-border);
-    flex-shrink: 0;
-  }
-
-  @media (max-width: 600px) {
-    .stats-grid {
-      flex-direction: column;
-    }
-
-    .stat-divider {
-      width: 80%;
-      height: 1px;
-    }
-  }
-
-  .stat-number {
+  .stat-n {
+    font-family: var(--font-display);
     font-size: var(--font-size-3xl);
-    font-weight: 800;
-    color: var(--color-primary);
-    letter-spacing: -0.03em;
+    font-weight: 900;
+    color: var(--color-primary-light);
     line-height: 1;
+    letter-spacing: -0.04em;
   }
 
-  .stat-label {
+  .stat-l {
     font-size: var(--font-size-xs);
-    color: var(--color-text-muted);
+    color: #8A7A6A;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     font-weight: 600;
-    text-align: center;
+  }
+
+  .stat-sep {
+    font-size: 1.5rem;
+    color: #3A2A1A;
+    user-select: none;
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .stat-sep { display: block; }
+  }
+
+  /* ══════════════════════════════════════════════
+     HOW IT WORKS
+  ══════════════════════════════════════════════ */
+  .how-section {
+    margin-bottom: var(--space-16);
+  }
+
+  .section-header {
+    margin-bottom: var(--space-12);
+  }
+
+  .section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-3);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(var(--font-size-3xl), 4vw, 3rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .section-title-accent {
+    color: var(--color-secondary);
+  }
+
+  .how-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-border);
+  }
+
+  @media (min-width: 768px) {
+    .how-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .how-step {
+    background: var(--color-surface);
+    padding: var(--space-8) var(--space-6);
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    transition: background 0.15s ease;
+  }
+
+  .how-step:hover { background: var(--color-surface-raised); }
+
+  .how-num {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--color-border);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    margin-bottom: var(--space-2);
+  }
+
+  .how-step h3 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .how-step p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    line-height: var(--line-height-relaxed);
+  }
+
+  /* ══════════════════════════════════════════════
+     FEATURE CARDS
+  ══════════════════════════════════════════════ */
+  .features-section {
+    margin-bottom: var(--space-16);
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .feature-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 900px) {
+    .feature-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .feature-card {
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8) var(--space-6);
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Top colored band on each card */
+  .fc-1::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--color-primary); }
+  .fc-2::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--color-secondary); }
+  .fc-3::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--color-accent); }
+
+  .fc-1:hover { border-color: rgba(15, 118, 110, 0.35); box-shadow: 0 12px 40px -8px rgba(15, 118, 110, 0.18); }
+  .fc-2:hover { border-color: rgba(29, 78, 216, 0.35); box-shadow: 0 12px 40px -8px rgba(29, 78, 216, 0.15); }
+  .fc-3:hover { border-color: rgba(180, 83, 9, 0.35); box-shadow: 0 12px 40px -8px rgba(180, 83, 9, 0.15); }
+
+  .fc-icon {
+    width: 44px; height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
+  }
+
+  .fc-1 .fc-icon { background: var(--color-primary-glow); color: var(--color-primary); }
+  .fc-2 .fc-icon { background: var(--color-secondary-glow); color: var(--color-secondary); }
+  .fc-3 .fc-icon { background: var(--color-accent-glow); color: var(--color-accent); }
+
+  .fc-index {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-dim);
+    letter-spacing: 0.06em;
+    position: absolute;
+    top: var(--space-5);
+    right: var(--space-5);
+  }
+
+  .fc-title {
+    font-family: var(--font-display);
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+    letter-spacing: -0.03em;
+  }
+
+  .fc-body {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    line-height: var(--line-height-relaxed);
+    margin: 0;
+  }
+
+  .fc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    text-decoration: none;
+    margin-top: var(--space-4);
+    transition: gap 0.18s ease;
+  }
+
+  .fc-1 .fc-link { color: var(--color-primary); }
+  .fc-2 .fc-link { color: var(--color-secondary); }
+  .fc-3 .fc-link { color: var(--color-accent); }
+
+  .fc-link:hover { gap: var(--space-3); text-decoration: none; }
+
+  /* ══════════════════════════════════════════════
+     CTA BANNER
+  ══════════════════════════════════════════════ */
+  .cta-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding: var(--space-12) var(--space-16);
+    background: var(--color-surface-raised);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-8);
+  }
+
+  /* Decorative tilted rule */
+  .cta-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 40%;
+    width: 1.5px;
+    background: var(--color-border);
+    transform: rotate(8deg) scaleY(1.5);
+    opacity: 0.4;
+  }
+
+  .cta-text { flex: 1; min-width: 260px; position: relative; z-index: 1; }
+
+  .cta-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-2);
+  }
+
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: var(--font-size-3xl);
+    font-weight: 900;
+    color: var(--color-text);
+    margin: 0 0 var(--space-3);
+    letter-spacing: -0.03em;
+  }
+
+  .cta-body {
+    margin: 0;
+    font-size: var(--font-size-base);
+    color: var(--color-text-muted);
+    line-height: var(--line-height-relaxed);
+    max-width: 44ch;
+  }
+
+  .cta-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-large {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--font-size-base);
+  }
+
+  .cta-github {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    background: transparent;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: all 0.18s ease;
+  }
+
+  .cta-github:hover {
+    border-color: var(--color-text);
+    color: var(--color-text);
+    text-decoration: none;
   }
 </style>

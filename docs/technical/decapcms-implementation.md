@@ -34,7 +34,7 @@ DecapCMS works with or without Netlify, but on Netlify the typical path is `git-
 
 ## Notes for this repo
 
-- Content maps to `src/content/master-library`.
+- Content maps to `src/content/complete-catalog`.
 - New metadata fields are included for role-aware views:
   - `dataThemes`
   - `pedagogicalTags`

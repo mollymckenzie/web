@@ -8,50 +8,44 @@ const features = collection.features as GeoMarkerFeature[];
 ---
 
 <Layout title="Community Map" description="Geographic markers for community data libraries">
-  <!-- Leaflet CSS/JS via CDN -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4Qj7v+ZtPjRrQqkKeNU5B0sB8rQkD+WfYV5b7rR/nM="
-    crossorigin=""
-  />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-VzL9bF7gCwEoEkQ3JwXj7c9bGmF+WjUZbQhVfReN+pA="
-    crossorigin=""
-  ></script>
   <section>
     <h1>Community Map</h1>
-    <p>Interactive map of community data library locations, datasets, organizations, and events.</p>
+    <p>Click anywhere on the map to drop a pin and see the nearest datasets for that community.</p>
 
-    <div id="map" role="region" aria-label="Community map"></div>
+    <div class="map-shell">
+      <div class="map-panel" id="map-panel" aria-live="polite">
+        <p class="panel-eyebrow">Community preview</p>
+        <h2 id="panel-title">Drop a pin on the map</h2>
+        <p id="panel-copy">We’ll surface the closest datasets in the CDL catalog for that location.</p>
+        <div id="nearby-list" class="nearby-list">
+          <p class="empty-copy">No pin selected yet.</p>
+        </div>
+      </div>
 
-    <form id="map-filters" class="filters" aria-label="Filter markers">
-      <fieldset>
-        <legend>Filter by category</legend>
-        <label><input type="checkbox" name="category" value="dataset" checked /> Dataset</label>
-        <label><input type="checkbox" name="category" value="site" checked /> Site</label>
-        <label><input type="checkbox" name="category" value="organization" checked /> Organization</label>
-        <label><input type="checkbox" name="category" value="event" checked /> Event</label>
-        <label><input type="checkbox" name="category" value="other" checked /> Other</label>
-      </fieldset>
-      <label class="tag-filter">
-        <span>Tags contains</span>
-        <input type="text" id="tag-query" placeholder="e.g., transport" />
-      </label>
-    </form>
+      <div id="map" role="region" aria-label="Community map"></div>
+    </div>
 
     <!-- Embed GeoJSON data for client-side usage -->
-    <script type="application/json" id="geojson-data">
-      {JSON.stringify(collection)}
-    </script>
+    <script type="application/json" id="geojson-data" set:html={JSON.stringify(collection)}></script>
 
-    <script>
-      // Initialize Leaflet map after DOM is ready
-      document.addEventListener('DOMContentLoaded', () => {
-        if (!window.L) return;
-        const L = window.L;
-        const map = L.map('map');
+    <script is:inline>
+      // Dynamically inject Leaflet CSS + JS then call initMap via onload,
+      // ensuring both the stylesheet and library are available before we
+      // measure the container or create any Leaflet objects.
+      (function loadLeaflet() {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+
+        var s = document.createElement('script');
+        s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        s.onload = initMap;
+        document.head.appendChild(s);
+      })();
+
+      function initMap() {
+        const map = L.map('map', { scrollWheelZoom: false });
         // Base layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution:
@@ -65,15 +59,16 @@ const features = collection.features as GeoMarkerFeature[];
 
         // Prepare data structures
         const bounds = L.latLngBounds([]);
-        const registry = []; // { feature, marker }
+        const registry = []; // { feature, marker, lat, lon, title, description, url, tags }
+        let userPin = null;
 
-        // Simple color mapping by category
+        // Color mapping by category — warm palette
         const colors = {
-          dataset: '#2563eb',
-          site: '#16a34a',
-          organization: '#7c3aed',
-          event: '#e11d48',
-          other: '#6b7280'
+          dataset: '#C2410C',   // terracotta (primary)
+          site: '#166534',      // forest green (secondary)
+          organization: '#B45309', // amber (accent)
+          event: '#9A3412',     // dark terracotta
+          other: '#A8927A'      // warm grey
         };
 
         for (const feature of data.features || []) {
@@ -98,137 +93,223 @@ const features = collection.features as GeoMarkerFeature[];
           marker.bindPopup(popupHtml);
 
           bounds.extend([lat, lon]);
-          registry.push({ feature, marker });
+          registry.push({
+            feature,
+            marker,
+            lat,
+            lon,
+            title: name,
+            description: String(feature.properties?.description ?? ''),
+            url,
+            tags: Array.isArray(feature.properties?.tags) ? feature.properties.tags : [],
+          });
         }
+
+        // Give the browser one tick after window.load to finalise any
+        // remaining paint work, then tell Leaflet the true container size.
+        setTimeout(() => {
+          map.invalidateSize({ animate: false });
+          if (bounds.isValid()) {
+            map.fitBounds(bounds.pad(0.25));
+          } else {
+            map.setView([20, 0], 2);
+          }
+        }, 50);
+
+        function haversineDistanceKm(leftLat, leftLon, rightLat, rightLon) {
+          const radiusKm = 6371;
+          const toRadians = (value) => (value * Math.PI) / 180;
+          const deltaLat = toRadians(rightLat - leftLat);
+          const deltaLon = toRadians(rightLon - leftLon);
+          const a =
+            Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+            Math.cos(toRadians(leftLat)) * Math.cos(toRadians(rightLat)) *
+            Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+          return 2 * radiusKm * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function escapeHtml(value) {
+          return String(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+        }
+
+        function renderNearbyResources(lat, lon) {
+          const panelTitle = document.getElementById('panel-title');
+          const panelCopy = document.getElementById('panel-copy');
+          const nearbyList = document.getElementById('nearby-list');
+
+          const nearby = registry
+            .map((item) => ({
+              ...item,
+              distance: haversineDistanceKm(lat, lon, item.lat, item.lon),
+            }))
+            .sort((left, right) => left.distance - right.distance)
+            .slice(0, 8);
+
+          if (panelTitle) panelTitle.textContent = 'Nearby datasets';
+          if (panelCopy) panelCopy.textContent = 'These are the closest CDL resources to your pin. Click a title to open its preview.';
+          if (!nearbyList) return;
+
+          nearbyList.innerHTML = nearby.length > 0
+            ? nearby.map((item) => {
+                const tagText = item.tags.slice(0, 3).join(', ');
+                const titleMarkup = item.url
+                  ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>`
+                  : escapeHtml(item.title);
+                return `<article class="nearby-item"><h3>${titleMarkup}</h3><p>${escapeHtml(item.description || 'No description provided.')}</p><p class="meta">${item.distance.toFixed(1)} km away${tagText ? ` · ${escapeHtml(tagText)}` : ''}</p></article>`;
+              }).join('')
+            : '<p class="empty-copy">No nearby resources found for this pin.</p>';
+        }
+
+        function placePin(lat, lon) {
+          if (userPin) userPin.remove();
+          userPin = L.marker([lat, lon]).addTo(map);
+          renderNearbyResources(lat, lon);
+        }
+
+        map.on('click', (event) => {
+          placePin(event.latlng.lat, event.latlng.lng);
+        });
 
         if (bounds.isValid()) {
           map.fitBounds(bounds.pad(0.25));
         } else {
-          map.setView([0, 0], 2);
+          map.setView([20, 0], 2);
         }
+      }
 
-        // Filtering
-        const form = document.getElementById('map-filters');
-        const tagInput = document.getElementById('tag-query');
-
-        function getSelectedCategories() {
-          const selected = new Set();
-          if (!form) return selected;
-          const inputs = form.querySelectorAll('input[name="category"]');
-          inputs.forEach((el) => {
-            if (el instanceof HTMLInputElement && el.checked) selected.add(el.value);
-          });
-          return selected;
-        }
-
-        function matchesTag(feature, query) {
-          if (!query) return true;
-          const q = String(query).trim().toLowerCase();
-          const tags = Array.isArray(feature.properties?.tags) ? feature.properties.tags : [];
-          return tags.some((t) => String(t).toLowerCase().includes(q));
-        }
-
-        function applyFilters() {
-          const selected = getSelectedCategories();
-          const q = tagInput instanceof HTMLInputElement ? tagInput.value : '';
-          const newBounds = L.latLngBounds([]);
-
-          for (const item of registry) {
-            const cat = item.feature.properties?.category || 'other';
-            const visible = selected.has(cat) && matchesTag(item.feature, q);
-            const [lon, lat] = item.feature.geometry.coordinates;
-            if (visible) {
-              if (!map.hasLayer(item.marker)) item.marker.addTo(map);
-              newBounds.extend([lat, lon]);
-            } else {
-              if (map.hasLayer(item.marker)) item.marker.remove();
-            }
-          }
-
-          if (newBounds.isValid()) {
-            map.fitBounds(newBounds.pad(0.25));
-          }
-        }
-
-        form?.addEventListener('change', applyFilters);
-        tagInput?.addEventListener('input', applyFilters);
-      });
+      // initMap is called via the Leaflet script's onload — no extra trigger needed.
     </script>
 
     <style>
-      #map {
-        height: 520px;
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
-        margin: var(--space-4) 0;
-      }
-
-      .filters {
-        display: grid;
-        gap: var(--space-4);
-        grid-template-columns: 1fr;
-        margin-bottom: var(--space-4);
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
-        padding: var(--space-4) var(--space-5);
-      }
-
-      @media (min-width: 640px) {
-        .filters {
-          grid-template-columns: auto 1fr;
-          align-items: center;
-        }
-      }
-
-      .filters fieldset {
-        border: none;
-        padding: 0;
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--space-3);
-        align-items: center;
-      }
-
-      .filters legend {
-        font-size: var(--font-size-sm);
-        font-weight: 600;
-        color: var(--color-text-muted);
+      section > h1 {
         margin-bottom: var(--space-2);
-        width: 100%;
       }
 
-      .filters label {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-        font-size: var(--font-size-sm);
-        cursor: pointer;
-      }
-
-      .tag-filter {
-        display: flex;
-        align-items: center;
-        gap: var(--space-2);
-        font-size: var(--font-size-sm);
-        font-weight: 600;
+      section > p:first-of-type {
         color: var(--color-text-muted);
+        font-size: var(--font-size-sm);
+        margin-bottom: 0;
       }
 
-      .tag-filter input {
+      .map-shell {
+        position: relative;
+        isolation: isolate;
+      }
+
+      #map {
+        height: 560px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        margin: 0 0 var(--space-4);
+        /* Override Leaflet's white background */
+        background: var(--color-surface) !important;
+        position: relative;
+        z-index: 0;
+        overflow: hidden;
+      }
+
+      .map-panel {
+        position: absolute;
+        top: var(--space-4);
+        right: var(--space-4);
+        width: min(340px, calc(100% - var(--space-8)));
+        max-height: calc(100% - var(--space-8));
+        overflow: auto;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        box-shadow: var(--shadow-lg);
+        padding: var(--space-4);
+        z-index: 2;
+      }
+
+      .panel-eyebrow {
+        margin: 0 0 var(--space-2);
+        font-size: var(--font-size-xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-secondary);
+      }
+
+      .map-panel h2 {
+        margin: 0 0 var(--space-2);
+        font-size: var(--font-size-lg);
+      }
+
+      .map-panel p {
+        margin: 0 0 var(--space-3);
+        color: var(--color-text-muted);
+        font-size: var(--font-size-sm);
+      }
+
+      .nearby-list {
+        display: grid;
+        gap: var(--space-3);
+      }
+
+      .nearby-item {
         border: 1px solid var(--color-border);
         border-radius: var(--radius-md);
-        padding: var(--space-2) var(--space-3);
+        background: var(--color-surface);
+        padding: var(--space-3);
+      }
+
+      .nearby-item h3 {
+        margin: 0 0 var(--space-1);
         font-size: var(--font-size-sm);
-        background: var(--color-background);
+      }
+
+      .nearby-item a {
         color: var(--color-text);
-        min-width: 160px;
+      }
+
+      .nearby-item p {
+        margin: 0;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-xs);
+        line-height: var(--line-height-relaxed);
+      }
+
+      .nearby-item .meta {
+        margin-top: var(--space-2);
+        color: var(--color-text-dim);
+      }
+
+      .empty-copy {
+        margin: 0;
+        color: var(--color-text-dim);
+        font-size: var(--font-size-sm);
+      }
+
+      /* Dark-ify Leaflet popup */
+      :global(.leaflet-popup-content-wrapper) {
+        background: var(--color-surface-raised) !important;
+        color: var(--color-text) !important;
+        border: 1px solid var(--color-border) !important;
+        box-shadow: var(--shadow-md) !important;
+        border-radius: var(--radius-md) !important;
+      }
+
+      :global(.leaflet-popup-tip) {
+        background: var(--color-surface-raised) !important;
+      }
+
+      :global(.leaflet-popup-content a) {
+        color: var(--color-primary) !important;
       }
 
       .marker-count {
-        font-size: var(--font-size-sm);
-        color: var(--color-text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--font-size-xs);
+        color: var(--color-text-dim);
         margin-top: var(--space-2);
       }
     </style>

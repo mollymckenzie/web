@@ -1,4 +1,4 @@
-# Community Data Libraries — Web
+# Community Data Libraries - Web
 
 Astro-based site for Community Data Libraries (CDL). This repo also hosts geographic marker data for mapping resources.
 

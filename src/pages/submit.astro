@@ -1,0 +1,694 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { withBasePath } from '@lib/paths';
+
+// Read search params to detect Netlify Forms success redirect
+const submitted = Astro.url.searchParams.get('submitted') === 'true';
+---
+
+<Layout
+  title="Submit a Dataset"
+  description="Suggest an Open Dataset for the Community Data Libraries catalog."
+>
+  <section class="submit-shell">
+
+    <!-- Page header -->
+    <header class="submit-header">
+      <div class="header-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Submit a Dataset</h1>
+        <p class="header-desc">
+          Suggest an open dataset containing community data.
+          All submissions are reviewed before publication.
+        </p>
+      </div>
+    </header>
+
+    <!-- Success banner (shown after Netlify redirect) -->
+    {submitted && (
+      <div class="success-banner" role="alert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>Submission received — thank you! We'll review your suggested dataset shortly.</span>
+      </div>
+    )}
+
+    <div class="submit-body">
+      <!-- Submission form (Netlify Forms) -->
+      <form
+        id="submit-form"
+        name="resource-submission"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action={withBasePath('/submit?submitted=true')}
+        class="form-card"
+        novalidate
+      >
+        <!-- Netlify hidden fields -->
+        <input type="hidden" name="form-name" value="resource-submission" />
+        <p class="visually-hidden">
+          <label>Don't fill this out: <input name="bot-field" /></label>
+        </p>
+
+        <!-- Section: Basic info -->
+        <fieldset class="form-section">
+          <legend>Dataset Details</legend>
+
+          <div class="field">
+            <label for="title">Title <span class="required" aria-label="required">*</span></label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required
+              minlength="3"
+              maxlength="200"
+              placeholder="e.g., 1950 U.S. Census"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="field">
+            <label for="description">Description <span class="required" aria-label="required">*</span></label>
+            <textarea
+              id="description"
+              name="description"
+              required
+              minlength="20"
+              maxlength="1000"
+              rows="4"
+              placeholder="Briefly describe what this dataset is, the key variables it contains, and why it may be interesting and/or useful to communities."
+            ></textarea>
+            <span class="field-hint">20–1000 characters</span>
+          </div>
+
+          <div class="field">
+            <label for="url">Dataset URL <span class="required" aria-label="required">*</span></label>
+            <input
+              type="url"
+              id="url"
+              name="url"
+              required
+              placeholder="https://example.org/dataset"
+              autocomplete="off"
+            />
+          </div>
+
+          <!-- <div class="field-row">
+            <div class="field">
+              <label for="category">Category <span class="required" aria-label="required">*</span></label>
+              <select id="category" name="category" required>
+                <option value="" disabled selected>Select a category…</option>
+                <option value="dataset">Dataset</option>
+                <option value="tool">Tool</option>
+                <option value="guide">Guide</option>
+                <option value="paper">Research Paper</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="difficulty">Difficulty Level</label>
+              <select id="difficulty" name="difficulty">
+                <option value="" selected>Not specified</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+          </div> -->
+        </fieldset>
+
+        <!-- Section: Audience -->
+        <fieldset class="form-section">
+          <!-- <legend>Intended Audience</legend>
+          <p class="fieldset-desc">Who should this resource be visible to?</p>
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="audience_teacher" value="teacher" checked />
+              <span class="checkbox-box" aria-hidden="true"></span>
+              Teacher
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="audience_student" value="student" checked />
+              <span class="checkbox-box" aria-hidden="true"></span>
+              Student
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="audience_community" value="community" checked />
+              <span class="checkbox-box" aria-hidden="true"></span>
+              Community Member
+            </label>
+          </div> -->
+
+          <legend>Sensitive Content?</legend>
+          <label class="toggle-label">
+            <input type="checkbox" name="sensitive" value="true" />
+            <span class="toggle-box" aria-hidden="true"></span>
+            <span>
+              This resource covers topics that may not be appropriate for all audiences (e.g., opioid data, violence statistics, etc.).
+            </span>
+          </label>
+        </fieldset>
+
+        <!-- Section: Classification -->
+        <fieldset class="form-section">
+          <legend>Classification</legend>
+
+          <div class="field">
+            <label for="data_themes">Data Themes</label>
+            <input
+              type="text"
+              id="data_themes"
+              name="data_themes"
+              placeholder="e.g., health, transportation, education"
+              autocomplete="off"
+            />
+            <span class="field-hint">Comma-separated themes that describe the data domain.</span>
+          </div>
+
+          <!-- <div class="field">
+            <label for="tags">Tags</label>
+            <input
+              type="text"
+              id="tags"
+              name="tags"
+              placeholder="e.g., open-data, CSV, geospatial, Python"
+              autocomplete="off"
+            />
+            <span class="field-hint">Comma-separated keywords for search and discovery.</span>
+          </div>
+
+          <div class="field">
+            <label for="pedagogical_tags">Pedagogical Tags <span class="optional">(teacher use only)</span></label>
+            <input
+              type="text"
+              id="pedagogical_tags"
+              name="pedagogical_tags"
+              placeholder="e.g., project-based-learning, data-literacy, capstone"
+              autocomplete="off"
+            />
+            <span class="field-hint">Tags describing how this resource can be used in teaching.</span>
+          </div> -->
+        </fieldset>
+
+        <!-- Section: Submitter info -->
+        <fieldset class="form-section">
+          <legend>About You <span class="optional">(optional)</span></legend>
+
+          <div class="field">
+            <label for="submitter_name">Your Name</label>
+            <input
+              type="text"
+              id="submitter_name"
+              name="submitter_name"
+              placeholder="Jane Smith"
+              autocomplete="name"
+            />
+          </div>
+          <div class="field">
+            <label for="submitter_email">Email</label>
+            <input
+              type="email"
+              id="submitter_email"
+              name="submitter_email"
+              placeholder="jane@example.org"
+              autocomplete="email"
+            />
+            <span class="field-hint">We'll only contact you if we have questions about your submission.</span>
+          </div>
+
+          <div class="field">
+            <label for="submitter_role">Your Role</label>
+            <select id="submitter_role" name="submitter_role">
+              <option value="" selected>Select a role…</option>
+              <option value="teacher">Teacher / Educator</option>
+              <option value="student">Student</option>
+              <option value="researcher">Researcher</option>
+              <option value="practitioner">Practitioner / Community Member</option>
+              <option value="librarian">Librarian / Information Specialist</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <div class="form-footer">
+          <p class="form-notice">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Submissions are reviewed by our editorial team. By submitting, you confirm this dataset is publicly available and appropriately licensed.
+          </p>
+          <button type="submit" class="button submit-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Submit Dataset
+          </button>
+        </div>
+      </form>
+
+      <!-- Sidebar: guidelines -->
+      <aside class="guidelines">
+        <h2>Submission Guidelines</h2>
+
+        <div class="guideline-item">
+          <div class="guideline-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <strong>Publicly accessible</strong>
+            <p>Datasets must be freely available online. Clearly document any access requirements.</p>
+          </div>
+        </div>
+
+        <div class="guideline-item">
+          <div class="guideline-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <strong>Appropriate license</strong>
+            <p>Datasets should be licensed for reuse (e.g., CC, ODbL, public domain). Proprietary datasets will not be listed.</p>
+          </div>
+        </div>
+
+        <!-- <div class="guideline-item">
+          <div class="guideline-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <strong>Relevant to data science education</strong>
+            <p>Resources should be useful for learning, teaching, or applying data science and related disciplines.</p>
+          </div>
+        </div> -->
+
+        <div class="guideline-item">
+          <div class="guideline-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <strong>No duplicates</strong>
+            <p>Check the <a href={withBasePath('/complete-catalog')}>Complete Catalog</a> first — we may already have the resource you're thinking of.</p>
+          </div>
+        </div>
+
+        <div class="guideline-item">
+          <div class="guideline-icon warn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <strong>Mark sensitive content</strong>
+            <p>If the resource covers topics like substance abuse, violence, or other sensitive areas, flag it so we can restrict it to appropriate audiences.</p>
+          </div>
+        </div>
+
+        <div class="review-note">
+          <h3>Review Process</h3>
+          <p>Submissions are reviewed within <strong>3–5 business days</strong>. Accepted resources are added to the Complete Catalog and, where appropriate, the Community Library.</p>
+          <p>You'll receive a confirmation email if you provide one. We may reach out with clarifying questions.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .submit-shell {
+    display: grid;
+    gap: var(--space-8);
+    max-width: 1100px;
+  }
+
+  /* ── Header ─────────────────────────── */
+  .submit-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .header-icon {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-lg);
+    color: var(--color-primary);
+  }
+
+  .submit-header h1 {
+    margin-bottom: var(--space-2);
+  }
+
+  .header-desc {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-relaxed);
+  }
+
+  /* ── Success banner ──────────────────── */
+  .success-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-lg);
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+  }
+
+  /* ── Body layout ─────────────────────── */
+  .submit-body {
+    display: grid;
+    gap: var(--space-8);
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 1024px) {
+    .submit-body {
+      grid-template-columns: 1fr 320px;
+    }
+  }
+
+  /* ── Form card ───────────────────────── */
+  .form-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  /* ── Fieldset sections ───────────────── */
+  .form-section {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .form-section legend {
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+    padding: 0;
+    letter-spacing: -0.01em;
+    width: 100%;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-3);
+  }
+
+  .fieldset-desc {
+    margin: calc(var(--space-4) * -1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  /* ── Fields ──────────────────────────── */
+  .field {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  @media (max-width: 600px) {
+    .field-row { grid-template-columns: 1fr; }
+  }
+
+  label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: 0.01em;
+    margin-bottom: 0;
+  }
+
+  .required {
+    color: var(--color-accent);
+    margin-left: 2px;
+  }
+
+  .optional {
+    font-weight: 400;
+    color: var(--color-text-dim);
+    font-size: var(--font-size-xs);
+    margin-left: var(--space-1);
+  }
+
+  input[type="text"],
+  input[type="url"],
+  input[type="email"],
+  select,
+  textarea {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9cc4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-3) center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  textarea { resize: vertical; min-height: 100px; }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+  }
+
+  input::placeholder,
+  textarea::placeholder { color: var(--color-text-dim); }
+
+  .field-hint {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-dim);
+    margin-top: calc(var(--space-1) * -1);
+  }
+
+  /* ── Checkboxes ──────────────────────── */
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .checkbox-label,
+  .toggle-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  .checkbox-label input[type="checkbox"],
+  .toggle-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .checkbox-box,
+  .toggle-box {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-raised);
+    transition: all 0.15s ease;
+    position: relative;
+    margin-top: 1px;
+  }
+
+  .checkbox-label input:checked ~ .checkbox-box,
+  .toggle-label input:checked ~ .toggle-box {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .checkbox-label input:checked ~ .checkbox-box::after,
+  .toggle-label input:checked ~ .toggle-box::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 6px;
+    height: 10px;
+    border: 2px solid #F8FAFC;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+  }
+
+  .toggle-label {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
+    transition: border-color 0.15s ease;
+  }
+
+  .toggle-label:has(input:checked) {
+    border-color: var(--color-accent);
+    background: rgba(245, 158, 11, 0.05);
+  }
+
+  .toggle-label strong { color: var(--color-text); display: block; margin-bottom: 2px; }
+  .toggle-label p { margin: 0; font-size: var(--font-size-xs); color: var(--color-text-dim); }
+
+  /* ── Form footer ─────────────────────── */
+  .form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+  }
+
+  .form-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-dim);
+    max-width: 45ch;
+    line-height: var(--line-height-relaxed);
+  }
+
+  .form-notice svg { flex-shrink: 0; margin-top: 1px; }
+
+  .submit-btn {
+    min-width: 180px;
+    gap: var(--space-2);
+  }
+
+  /* ── Guidelines sidebar ──────────────── */
+  .guidelines {
+    display: grid;
+    gap: var(--space-5);
+    position: sticky;
+    top: calc(60px + var(--space-6));
+  }
+
+  .guidelines h2 {
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--color-text-dim);
+    margin: 0;
+  }
+
+  .guideline-item {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    font-size: var(--font-size-sm);
+  }
+
+  .guideline-icon {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-primary);
+    margin-top: 1px;
+  }
+
+  .guideline-icon.warn {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-accent);
+  }
+
+  .guideline-item strong {
+    display: block;
+    color: var(--color-text);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-1);
+  }
+
+  .guideline-item p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .guideline-item a { color: var(--color-primary); }
+
+  .review-note {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    background: var(--color-surface);
+  }
+
+  .review-note h3 {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-dim);
+    margin-bottom: var(--space-3);
+  }
+
+  .review-note p {
+    margin: 0 0 var(--space-3);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .review-note p:last-child { margin-bottom: 0; }
+
+  /* ── Utility ──────────────────────────── */
+  .visually-hidden {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+</style>

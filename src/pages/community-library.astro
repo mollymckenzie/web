@@ -1,10 +1,881 @@
 ---
 import Layout from '@layouts/Layout.astro';
+import submissions from '@data/community-submissions.json';
+import { withBasePath } from '@lib/paths';
+
+// Types
+interface Submission {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  category: string;
+  tags: string[];
+  dataThemes: string[];
+  difficulty: string;
+  region: string;
+  submittedBy: string;
+  submittedByRole: string;
+  submittedAt: string;
+  featured: boolean;
+}
+
+const all: Submission[] = submissions;
+
+// Read filter params from query string
+// Derive filter options for populating selects (server-rendered, all items)
+const allCategories = Array.from(new Set(all.map(s => s.category))).sort();
+const allThemes = Array.from(new Set(all.flatMap(s => s.dataThemes))).sort();
+const allRegions = Array.from(new Set(all.map(s => s.region))).sort();
+
+// Render all items — filtering is handled client-side
+const sorted = [...all].sort((a, b) =>
+  new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+);
+
+const clearHref = withBasePath('/community-library');
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+const categoryIcons: Record<string, string> = {
+  dataset: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>`,
+  tool: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+  guide: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+  paper: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+};
 ---
 
-<Layout title="Community Library" description="Community-contributed resources (coming soon)">
-  <section>
-    <h1>Community Library</h1>
-    <p>Community submissions will appear here. We are finalizing structure and submission flow. See documentation in <a href="/web/docs/community-library-structure">docs</a>.</p>
+<Layout
+  title="Community Library"
+  description="Resources contributed by practitioners, teachers, researchers, and community members worldwide."
+>
+  <section class="cl-shell">
+
+    <!-- Page header -->
+    <header class="cl-header">
+      <div class="cl-header-text">
+        <div class="eyebrow">Community Contributed</div>
+        <h1>Community Library</h1>
+        <p class="cl-desc">
+          Resources discovered and shared by practitioners, researchers, teachers, and community members from around the world. For a concrete implementation, explore the <a href={withBasePath('/example-community-library')}>Example Community Library (Knox County)</a>, which complements the <a href={withBasePath('/complete-catalog')}>Complete Catalog</a> with locally relevant datasets and tools.
+        </p>
+      </div>
+      <a href={withBasePath('/submit')} class="button submit-cta">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Submit a Resource
+      </a>
+    </header>
+
+    <!-- Stats bar -->
+    <div class="stats-bar" aria-label="Library statistics">
+      <div class="stat">
+        <span class="stat-n">{all.length}</span>
+        <span class="stat-l">Total Resources</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n">{all.filter(s => s.category === 'dataset').length}</span>
+        <span class="stat-l">Datasets</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n">{allThemes.length}</span>
+        <span class="stat-l">Themes</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n">{Array.from(new Set(all.map(s => s.region))).length}</span>
+        <span class="stat-l">Regions</span>
+      </div>
+    </div>
+
+    <div class="cl-body">
+      <!-- Sidebar filters -->
+      <aside class="cl-sidebar" id="cl-sidebar">
+        <div class="sidebar-head">
+          <h2>Filters</h2>
+          <button class="sidebar-close" id="cl-sidebar-close" aria-label="Close filters">✕</button>
+        </div>
+
+        <form class="cl-filters" id="cl-filter-form">
+          <div class="filter-field">
+            <label for="cl-q">Search</label>
+            <input type="search" id="cl-q" name="q" placeholder="Title, tags, region…" />
+          </div>
+
+          <div class="filter-field">
+            <label for="cl-cat">Category</label>
+            <select id="cl-cat" name="category">
+              <option value="">All categories</option>
+              {allCategories.map(c => (
+                <option value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="cl-theme">Data Theme</label>
+            <select id="cl-theme" name="theme">
+              <option value="">All themes</option>
+              {allThemes.map(t => (
+                <option value={t}>{t}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="cl-region">Region</label>
+            <select id="cl-region" name="region">
+              <option value="">All regions</option>
+              {allRegions.map(r => (
+                <option value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="cl-sort">Sort by</label>
+            <select id="cl-sort" name="sort">
+              <option value="newest">Newest first</option>
+              <option value="title">A–Z</option>
+            </select>
+          </div>
+
+          <div class="filter-actions">
+            <button type="submit" class="button">Apply</button>
+            <a href={clearHref} class="reset-link">Reset</a>
+          </div>
+        </form>
+
+        <!-- Category breakdown -->
+        <div class="type-panel">
+          <h3>By Category</h3>
+          <ul>
+            {allCategories.map(c => (
+              <li>
+                <span>{c.charAt(0).toUpperCase() + c.slice(1)}</span>
+                <strong>{all.filter(s => s.category === c).length}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <div class="cl-content">
+        <button class="mobile-filter-btn" id="cl-filter-btn" aria-expanded="false" aria-controls="cl-sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          Filters
+        </button>
+
+        <!-- Active filters -->
+        <div class="active-filters" id="cl-active-filters" aria-label="Active filters" style="display:none">
+          <span id="cl-filter-chips"></span>
+          <a href={clearHref} class="chip chip-clear" id="cl-clear-link">Clear all ✕</a>
+        </div>
+
+        <!-- Results count -->
+        <div class="results-bar">
+          <p id="cl-resource-count"><strong>{sorted.length}</strong> {sorted.length === 1 ? 'resource' : 'resources'} in the community library</p>
+        </div>
+
+        <!-- All resources -->
+        {sorted.length > 0 && (
+          <section class="results-section">
+            <div class="results-list">
+              {sorted.map(s => (
+                <article
+                  class="result-card"
+                  data-search={[s.title, s.description, ...s.dataThemes, ...s.tags, s.region].join(' ').toLowerCase()}
+                  data-themes={s.dataThemes.join('|')}
+                  data-region={s.region}
+                  data-title={s.title}
+                  data-date={new Date(s.submittedAt).getTime()}
+                >
+                  <div class="result-main">
+                    <div class="card-top">
+                      <div class="card-category" set:html={categoryIcons[s.category] ?? ''} />
+                      <span class="chip">{s.category}</span>
+                    </div>
+                    <h3>
+                      <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
+                    </h3>
+                    <p>{s.description}</p>
+                    <div class="chips">
+                      {s.dataThemes.slice(0, 3).map(t => <span class="chip chip-theme">{t}</span>)}
+                      {s.tags.slice(0, 2).map(t => <span class="chip">{t}</span>)}
+                    </div>
+                  </div>
+                  <aside class="result-side">
+                    <div class="side-item">
+                      <span class="side-label">Region</span>
+                      <span class="side-value">{s.region}</span>
+                    </div>
+                    <div class="side-item">
+                      <span class="side-label">Added</span>
+                      <span class="side-value">{formatDate(s.submittedAt)}</span>
+                    </div>
+                    <div class="side-item">
+                      <span class="side-label">By</span>
+                      <span class="side-value">{s.submittedBy}</span>
+                    </div>
+                    <a href={s.url} target="_blank" rel="noopener noreferrer" class="visit-btn">
+                      Visit resource ↗
+                    </a>
+                  </aside>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {sorted.length === 0 && (
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <h3>No resources match these filters</h3>
+            <p>Try adjusting your search or <a href={clearHref}>clear all filters</a>.</p>
+          </div>
+        )}
+
+      </div>
+    </div>
   </section>
+
+  <script>
+    // ── Mobile sidebar toggle ───────────────────────────────────
+    const filterBtn = document.getElementById('cl-filter-btn');
+    const sidebar = document.getElementById('cl-sidebar');
+    const sidebarClose = document.getElementById('cl-sidebar-close');
+
+    filterBtn?.addEventListener('click', () => {
+      sidebar?.classList.add('open');
+      filterBtn.setAttribute('aria-expanded', 'true');
+    });
+    sidebarClose?.addEventListener('click', () => {
+      sidebar?.classList.remove('open');
+      filterBtn?.setAttribute('aria-expanded', 'false');
+    });
+
+    // ── Client-side filtering ───────────────────────────────────
+    const form = document.getElementById('cl-filter-form') as HTMLFormElement | null;
+    const searchInput  = document.getElementById('cl-q')       as HTMLInputElement  | null;
+    const categorySelect = document.getElementById('cl-cat')   as HTMLSelectElement | null;
+    const themeSelect  = document.getElementById('cl-theme')   as HTMLSelectElement | null;
+    const regionSelect = document.getElementById('cl-region')  as HTMLSelectElement | null;
+    const sortSelect   = document.getElementById('cl-sort')    as HTMLSelectElement | null;
+    const countEl      = document.getElementById('cl-resource-count');
+    const activeFiltersEl = document.getElementById('cl-active-filters');
+    const filterChipsEl   = document.getElementById('cl-filter-chips');
+    const clearLink    = document.getElementById('cl-clear-link') as HTMLAnchorElement | null;
+    const resultsList  = document.querySelector<HTMLElement>('.results-list');
+
+    function applyFilters() {
+      const q        = searchInput?.value.trim().toLowerCase() ?? '';
+      const category = categorySelect?.value ?? '';
+      const theme    = themeSelect?.value ?? '';
+      const region   = regionSelect?.value ?? '';
+      const sort     = sortSelect?.value ?? 'newest';
+
+      const cards = Array.from(document.querySelectorAll<HTMLElement>('.result-card'));
+      let visible = 0;
+
+      cards.forEach(card => {
+        const search   = card.dataset.search ?? '';
+        const themes   = (card.dataset.themes ?? '').split('|').filter(Boolean);
+        const cardRegion = card.dataset.region ?? '';
+        // category: read from the chip text inside the card
+        const cardCategory = card.querySelector('.card-top .chip')?.textContent?.trim() ?? '';
+
+        const ok =
+          (!q        || search.includes(q)) &&
+          (!category || cardCategory === category) &&
+          (!theme    || themes.includes(theme)) &&
+          (!region   || cardRegion === region);
+
+        card.style.display = ok ? '' : 'none';
+        if (ok) visible++;
+      });
+
+      // Re-sort visible cards
+      if (resultsList) {
+        const sorted = cards
+          .filter(c => c.style.display !== 'none')
+          .sort((a, b) => {
+            if (sort === 'title') {
+              return (a.dataset.title ?? '').localeCompare(b.dataset.title ?? '');
+            }
+            return Number(b.dataset.date ?? '0') - Number(a.dataset.date ?? '0');
+          });
+        sorted.forEach(c => resultsList.appendChild(c));
+      }
+
+      // Update count
+      if (countEl) {
+        countEl.innerHTML = `<strong>${visible}</strong> ${visible === 1 ? 'resource' : 'resources'} ${visible !== cards.length ? 'match your filters' : 'in the community library'}`;
+      }
+
+      // Update active filter chips
+      const labels: string[] = [];
+      if (q)        labels.push(`Search: "${searchInput?.value.trim()}"`);
+      if (category) labels.push(`Category: ${category}`);
+      if (theme)    labels.push(`Theme: ${theme}`);
+      if (region)   labels.push(`Region: ${region}`);
+
+      if (activeFiltersEl && filterChipsEl) {
+        filterChipsEl.innerHTML = labels.map(l => `<span class="chip">${l}</span>`).join('');
+        activeFiltersEl.style.display = labels.length > 0 ? 'flex' : 'none';
+      }
+    }
+
+    // Prevent form submission — filter is client-side only
+    form?.addEventListener('submit', (e) => { e.preventDefault(); applyFilters(); });
+
+    // Live filtering on input/change
+    searchInput?.addEventListener('input', applyFilters);
+    categorySelect?.addEventListener('change', applyFilters);
+    themeSelect?.addEventListener('change', applyFilters);
+    regionSelect?.addEventListener('change', applyFilters);
+    sortSelect?.addEventListener('change', applyFilters);
+
+    // Clear all resets inputs then filters
+    clearLink?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (searchInput)   searchInput.value = '';
+      if (categorySelect) categorySelect.value = '';
+      if (themeSelect)   themeSelect.value = '';
+      if (regionSelect)  regionSelect.value = '';
+      if (sortSelect)    sortSelect.value = 'newest';
+      applyFilters();
+    });
+  </script>
+
+  <style>
+    /* ── Shell ──────────────────────────── */
+    .cl-shell {
+      display: grid;
+      gap: var(--space-8);
+    }
+
+    /* ── Header ──────────────────────────── */
+    .cl-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+
+    .cl-header-text { flex: 1; min-width: 280px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-1) var(--space-3);
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 999px;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--color-secondary);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-4);
+    }
+
+    .cl-header h1 { margin-bottom: var(--space-3); }
+
+    .cl-desc {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-lg);
+      line-height: var(--line-height-relaxed);
+      max-width: 65ch;
+    }
+
+    .cl-desc a { color: var(--color-primary); }
+
+    .submit-cta { flex-shrink: 0; }
+
+    /* ── Stats bar ───────────────────────── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--color-border);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    @media (min-width: 640px) {
+      .stats-bar { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-5) var(--space-4);
+      gap: var(--space-1);
+      background: var(--color-surface);
+      text-align: center;
+    }
+
+    .stat-n {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-2xl);
+      font-weight: 500;
+      color: var(--color-secondary);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-l {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    /* ── Body layout ─────────────────────── */
+    .cl-body {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+
+    @media (min-width: 1024px) {
+      .cl-body { grid-template-columns: minmax(240px, 270px) 1fr; align-items: start; }
+    }
+
+    /* ── Mobile filter toggle ─────────── */
+    .mobile-filter-btn {
+      display: none;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      margin-bottom: var(--space-4);
+      transition: all 0.15s ease;
+    }
+
+    .mobile-filter-btn:hover {
+      border-color: var(--color-secondary);
+      color: var(--color-secondary);
+      background: rgba(99, 102, 241, 0.08);
+      box-shadow: none;
+      transform: none;
+    }
+
+    @media (max-width: 1023px) {
+      .mobile-filter-btn { display: inline-flex; }
+      .sidebar-close { display: inline-flex; align-items: center; }
+
+      .cl-sidebar {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 200;
+        border-radius: 0;
+        overflow-y: auto;
+        border: none;
+        padding-top: var(--space-8);
+      }
+
+      .cl-sidebar.open { display: grid; }
+    }
+
+    /* ── Sidebar ──────────────────────── */
+    .cl-sidebar {
+      position: sticky;
+      top: calc(60px + var(--space-6));
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      padding: var(--space-5);
+      display: grid;
+      gap: var(--space-5);
+    }
+
+    .sidebar-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cl-sidebar h2 {
+      margin: 0;
+      font-size: var(--font-size-lg);
+    }
+
+    .sidebar-close {
+      display: none;
+      background: none;
+      border: 1px solid var(--color-border);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-md);
+      transition: all 0.15s ease;
+    }
+
+    .cl-filters {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .filter-field {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .filter-field label {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-dim);
+    }
+
+    .filter-field input,
+    .filter-field select {
+      width: 100%;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface-raised);
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      transition: border-color 0.15s ease;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .filter-field input:focus,
+    .filter-field select:focus {
+      outline: none;
+      border-color: var(--color-secondary);
+    }
+
+    .filter-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .filter-actions .button {
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--font-size-sm);
+      background: var(--color-secondary);
+    }
+
+    .filter-actions .button:hover {
+      background: #4f46e5;
+      box-shadow: var(--shadow-glow-secondary);
+    }
+
+    .reset-link {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .reset-link:hover {
+      border-color: var(--color-secondary);
+      color: var(--color-secondary);
+      text-decoration: none;
+    }
+
+    .type-panel {
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-4);
+    }
+
+    .type-panel h3 {
+      margin: 0 0 var(--space-3);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-dim);
+    }
+
+    .type-panel ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .type-panel li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .type-panel li strong {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: var(--color-secondary);
+    }
+
+    /* ── Content ──────────────────────── */
+    .cl-content { display: grid; gap: var(--space-5); }
+
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .chip-clear {
+      border-color: rgba(245, 158, 11, 0.4);
+      color: var(--color-accent);
+      background: rgba(245, 158, 11, 0.07);
+      text-decoration: none;
+    }
+
+    .results-bar {
+      display: flex;
+      align-items: center;
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .results-bar strong { color: var(--color-text); }
+    .results-bar p { margin: 0; }
+
+    /* ── Chips ──────────────────────── */
+    .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      font-size: var(--font-size-xs);
+      font-weight: 500;
+      color: var(--color-text-muted);
+      background: var(--color-surface-raised);
+    }
+
+    .chip-theme {
+      border-color: rgba(99, 102, 241, 0.3);
+      color: var(--color-secondary);
+      background: rgba(99, 102, 241, 0.07);
+    }
+
+    .chip-green { border-color: rgba(16, 185, 129, 0.3); color: var(--color-primary); background: rgba(16, 185, 129, 0.07); }
+    .chip-yellow { border-color: rgba(245, 158, 11, 0.3); color: var(--color-accent); background: rgba(245, 158, 11, 0.07); }
+    .chip-red { border-color: rgba(239, 68, 68, 0.3); color: #f87171; background: rgba(239, 68, 68, 0.07); }
+
+    /* ── Section labels ─────────────── */
+    .section-label {
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-dim);
+      margin: 0 0 var(--space-4);
+    }
+
+    /* ── Featured cards ─────────────── */
+    .featured-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 640px) {
+      .featured-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .featured-card {
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      padding: var(--space-5);
+      display: grid;
+      gap: var(--space-3);
+      align-content: start;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .featured-card:hover {
+      border-color: rgba(99, 102, 241, 0.5);
+      box-shadow: 0 8px 32px -8px rgba(99, 102, 241, 0.2);
+    }
+
+    /* ── Card top ────────────────────── */
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .card-category {
+      color: var(--color-secondary);
+      display: flex;
+      align-items: center;
+    }
+
+    /* ── Card headings ──────────────── */
+    .featured-card h3, .result-main h3 {
+      margin: 0;
+      font-size: var(--font-size-lg);
+      letter-spacing: -0.02em;
+    }
+
+    .featured-card h3 a, .result-main h3 a {
+      color: var(--color-text);
+      transition: color 0.15s ease;
+      text-decoration: none;
+    }
+
+    .featured-card h3 a:hover, .result-main h3 a:hover {
+      color: var(--color-secondary);
+    }
+
+    .featured-card p, .result-main p {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .meta-region, .meta-submitter {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-dim);
+      font-family: var(--font-mono);
+    }
+
+    /* ── Result cards ───────────────── */
+    .results-list { display: grid; gap: var(--space-3); }
+
+    .result-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      display: grid;
+      grid-template-columns: 1fr;
+      transition: border-color 0.15s ease;
+    }
+
+    .result-card:hover {
+      border-color: var(--color-border-highlight);
+    }
+
+    @media (min-width: 900px) {
+      .result-card { grid-template-columns: minmax(0, 1fr) 200px; }
+    }
+
+    .result-main {
+      padding: var(--space-5);
+      display: grid;
+      gap: var(--space-3);
+      align-content: start;
+    }
+
+    .result-side {
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface-raised);
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      display: grid;
+      gap: var(--space-3);
+      align-content: start;
+    }
+
+    @media (min-width: 900px) {
+      .result-side {
+        border-top: none;
+        border-left: 1px solid var(--color-border);
+        border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      }
+    }
+
+    .side-item { display: grid; gap: 2px; }
+
+    .side-label {
+      font-size: var(--font-size-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-dim);
+      font-weight: 600;
+    }
+
+    .side-value {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .visit-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-2) var(--space-3);
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: var(--radius-md);
+      color: var(--color-secondary);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      margin-top: var(--space-1);
+    }
+
+    .visit-btn:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--color-secondary);
+      text-decoration: none;
+    }
+
+    /* ── Empty state ────────────────── */
+    .empty-state {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-12) var(--space-8);
+      text-align: center;
+      color: var(--color-text-dim);
+    }
+
+    .empty-state svg { margin: 0 auto var(--space-4); display: block; opacity: 0.4; }
+    .empty-state h3 { font-size: var(--font-size-lg); color: var(--color-text-muted); margin-bottom: var(--space-2); }
+    .empty-state p { margin: 0; font-size: var(--font-size-sm); }
+    .empty-state a { color: var(--color-secondary); }
+
+  </style>
 </Layout>
